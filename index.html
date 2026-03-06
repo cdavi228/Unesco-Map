@@ -246,6 +246,11 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
       <div class="hstat"><b id="sr">0</b>Remaining</div>
       <div class="hstat"><b id="st">0</b>Total</div>
     </div>
+      <div id="user-pill" class="hidden">
+        <span class="sync-dot"></span><span id="user-email"></span>
+        <button id="logout-btn" onclick="signOut()">Sign out</button>
+      </div>
+      <button id="login-btn" onclick="showAuth()">Sign in</button>
   </header>
   <div id="sidebar">
     <div class="ftab-row">
