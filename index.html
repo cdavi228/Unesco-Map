@@ -1239,6 +1239,2359 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px)
+    }
+
+    #auth-overlay.hidden {
+      display: none
+    }
+
+    #auth-box {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 32px 36px;
+      width: 340px;
+      box-shadow: 0 24px 64px rgba(22, 18, 14, .35)
+    }
+
+    .auth-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 400;
+      margin-bottom: 4px;
+      color: var(--ink)
+    }
+
+    .auth-sub {
+      font-size: 8px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px
+    }
+
+    .auth-label {
+      font-size: 8px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 5px
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 9px 12px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 12px;
+      background: var(--paper3);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: var(--ink);
+      outline: none;
+      margin-bottom: 14px;
+      transition: border-color .15s
+    }
+
+    .auth-input:focus {
+      border-color: var(--gold-light);
+      background: var(--paper)
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 10px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 8px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      font-weight: 600;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background .15s
+    }
+
+    .auth-btn:hover {
+      background: #2a2218
+    }
+
+    .auth-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    .auth-toggle {
+      font-size: 8px;
+      letter-spacing: .08em;
+      color: var(--muted);
+      text-align: center;
+      cursor: pointer
+    }
+
+    .auth-toggle span {
+      color: var(--gold);
+      text-decoration: underline;
+      cursor: pointer
+    }
+
+    .auth-err {
+      font-size: 8px;
+      color: var(--red);
+      margin-bottom: 10px;
+      min-height: 14px;
+      letter-spacing: .04em
+    }
+
+    .auth-divider {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 14px 0
+    }
+
+    /* ── User pill in header ─────────────────────────────────────────────────── */
+    #user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 8px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted)
+    }
+
+    #user-pill.hidden {
+      display: none
+    }
+
+    #login-btn {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 7px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s
+    }
+
+    #login-btn:hover {
+      border-color: var(--gold-light);
+      color: var(--ink)
+    }
+
+    #logout-btn {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 7px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s
+    }
+
+    #logout-btn:hover {
+      border-color: var(--red);
+      color: var(--red)
+    }
+
+    #user-email {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 7.5px;
+      color: var(--muted);
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .sync-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--nat);
+      display: inline-block;
+      margin-right: 3px
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="auth-overlay" class="hidden">
+    <div id="auth-box">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to sync your visited sites</div>
+      <div class="auth-err" id="auth-err"></div>
+      <label class="auth-label">Email</label>
+      <input class="auth-input" id="auth-email" type="email" placeholder="you@example.com">
+      <label class="auth-label">Password</label>
+      <input class="auth-input" id="auth-pass" type="password" placeholder="••••••••">
+      <button class="auth-btn" id="auth-submit">Sign in</button>
+      <div class="auth-toggle" id="auth-toggle">No account? <span onclick="toggleAuthMode()">Create one</span></div>
+      <hr class="auth-divider">
+      <div style="font-size:7px;color:var(--muted2);text-align:center;letter-spacing:.06em">Your visited sites sync
+        across all devices</div>
+    </div>
+  </div>
+
+  <div id="app">
+    <header>
+      <div class="htitle">Europe <span class="sep">—</span> <em>UNESCO Heritage</em> <span class="sub">Travel
+          Journal</span></div>
+      <div class="hstats">
+        <div class="hstat"><b class="gold" id="sv">0</b>Visited</div>
+        <div class="hstat"><b id="sr">0</b>Remaining</div>
+        <div class="hstat"><b id="st">0</b>Total</div>
+      </div>
+      <div id="user-pill" class="hidden">
+        <span class="sync-dot"></span><span id="user-email"></span>
+        <button id="logout-btn" onclick="signOut()">Sign out</button>
+      </div>
+      <button id="login-btn" onclick="showAuth()">Sign in</button>
+    </header>
+    <div id="sidebar">
+      <div class="ftab-row">
+        <button class="ftab on" data-f="all">All</button>
+        <button class="ftab" data-f="visited">Visited</button>
+        <button class="ftab" data-f="unvisited">To See</button>
+      </div>
+      <div class="cfilter">
+        <button class="cflag" data-c="DE"><span class="flag">🇩🇪</span>Germany</button>
+        <button class="cflag" data-c="FR"><span class="flag">🇫🇷</span>France</button>
+        <button class="cflag" data-c="IT"><span class="flag">🇮🇹</span>Italy</button>
+        <button class="cflag" data-c="ES"><span class="flag">🇪🇸</span>Spain</button>
+        <button class="cflag" data-c="PT"><span class="flag">🇵🇹</span>Portugal</button>
+        <button class="cflag" data-c="GR"><span class="flag">🇬🇷</span>Greece</button>
+        <button class="cflag" data-c="PL"><span class="flag">🇵🇱</span>Poland</button>
+        <button class="cflag" data-c="RO"><span class="flag">🇷🇴</span>Romania</button>
+        <button class="cflag" data-c="AT"><span class="flag">🇦🇹</span>Austria</button>
+        <button class="cflag" data-c="BE"><span class="flag">🇧🇪</span>Belgium</button>
+        <button class="cflag" data-c="NL"><span class="flag">🇳🇱</span>Netherlands</button>
+        <button class="cflag" data-c="HU"><span class="flag">🇭🇺</span>Hungary</button>
+        <button class="cflag" data-c="BG"><span class="flag">🇧🇬</span>Bulgaria</button>
+        <button class="cflag" data-c="HR"><span class="flag">🇭🇷</span>Croatia</button>
+        <button class="cflag" data-c="SK"><span class="flag">🇸🇰</span>Slovakia</button>
+        <button class="cflag" data-c="CZ"><span class="flag">🇨🇿</span>Czechia</button>
+        <button class="cflag" data-c="SI"><span class="flag">🇸🇮</span>Slovenia</button>
+        <button class="cflag" data-c="SE"><span class="flag">🇸🇪</span>Sweden</button>
+        <button class="cflag" data-c="DK"><span class="flag">🇩🇰</span>Denmark</button>
+        <button class="cflag" data-c="FI"><span class="flag">🇫🇮</span>Finland</button>
+        <button class="cflag" data-c="NO"><span class="flag">🇳🇴</span>Norway</button>
+        <button class="cflag" data-c="IE"><span class="flag">🇮🇪</span>Ireland</button>
+        <button class="cflag" data-c="LT"><span class="flag">🇱🇹</span>Lithuania</button>
+        <button class="cflag" data-c="LV"><span class="flag">🇱🇻</span>Latvia</button>
+        <button class="cflag" data-c="EE"><span class="flag">🇪🇪</span>Estonia</button>
+        <button class="cflag" data-c="LU"><span class="flag">🇱🇺</span>Luxembourg</button>
+        <button class="cflag" data-c="MT"><span class="flag">🇲🇹</span>Malta</button>
+        <button class="cflag" data-c="CY"><span class="flag">🇨🇾</span>Cyprus</button>
+      </div>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="6.5" cy="6.5" r="4.5" />
+          <path d="M10.5 10.5l3 3" />
+        </svg>
+        <input class="srch" id="srch" type="text" placeholder="Search sites…">
+      </div>
+      <div id="list"></div>
+      <div class="sbfoot">
+        <div class="pflex"><span class="plabel">Progress</span><span class="pval"><span id="sv2">0</span> <span>/ <span
+                id="st2">0</span></span></span></div>
+        <div class="ptrack">
+          <div class="pfill" id="pfill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div id="mapwrap">
+      <div id="map"></div>
+      <div id="legend">
+        <div class="leg-title">EU + Norway · 27 countries</div>
+        <div class="leg-div"></div>
+        <div class="li">
+          <div class="ldot" style="background:var(--vis)"></div>Visited
+        </div>
+        <div class="li">
+          <div class="ldot" style="background:transparent;border:1.5px solid #b5afa6;width:7px;height:7px"></div>Not
+          visited
+        </div>
+        <div class="leg-tip">Click dot · toggle visited</div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const COUNTRY_COLORS = {
+      DE: { fill: '#2a5c3f', stroke: '#162e22' }, FR: { fill: '#1a4a7a', stroke: '#0d2640' },
+      IT: { fill: '#7a2020', stroke: '#3d1010' }, SE: { fill: '#4a6b8a', stroke: '#253850' },
+      NO: { fill: '#7a4a1a', stroke: '#3d250d' }, CZ: { fill: '#5a2a6a', stroke: '#2d1535' },
+      ES: { fill: '#8a2a1a', stroke: '#45150d' }, PT: { fill: '#1a6a3a', stroke: '#0d351d' },
+      AT: { fill: '#6a3a1a', stroke: '#351d0d' }, BE: { fill: '#5a4a1a', stroke: '#2d250d' },
+      NL: { fill: '#1a5a6a', stroke: '#0d2d35' }, GR: { fill: '#1a3a8a', stroke: '#0d1d45' },
+      PL: { fill: '#8a1a3a', stroke: '#450d1d' }, HU: { fill: '#6a1a5a', stroke: '#350d2d' },
+      RO: { fill: '#4a1a6a', stroke: '#250d35' }, BG: { fill: '#2a4a6a', stroke: '#152535' },
+      HR: { fill: '#8a2a2a', stroke: '#451515' }, SK: { fill: '#5a6a1a', stroke: '#2d350d' },
+      SI: { fill: '#1a4a5a', stroke: '#0d252d' }, DK: { fill: '#8a2a4a', stroke: '#451525' },
+      FI: { fill: '#1a4a8a', stroke: '#0d2545' }, EE: { fill: '#5a3a6a', stroke: '#2d1d35' },
+      LV: { fill: '#6a2a4a', stroke: '#351525' }, LT: { fill: '#4a6a2a', stroke: '#253515' },
+      LU: { fill: '#6a5a2a', stroke: '#352d15' }, IE: { fill: '#2a6a4a', stroke: '#153525' },
+      MT: { fill: '#8a5a1a', stroke: '#452d0d' }, CY: { fill: '#6a4a2a', stroke: '#352515' },
+    };
+    const COUNTRY_NAMES = {
+      DE: 'Germany', FR: 'France', IT: 'Italy', SE: 'Sweden', NO: 'Norway', CZ: 'Czechia',
+      ES: 'Spain', PT: 'Portugal', AT: 'Austria', BE: 'Belgium', NL: 'Netherlands', GR: 'Greece',
+      PL: 'Poland', HU: 'Hungary', RO: 'Romania', BG: 'Bulgaria', HR: 'Croatia', SK: 'Slovakia',
+      SI: 'Slovenia', DK: 'Denmark', FI: 'Finland', EE: 'Estonia', LV: 'Latvia', LT: 'Lithuania',
+      LU: 'Luxembourg', IE: 'Ireland', MT: 'Malta', CY: 'Cyprus'
+    };
+    const COUNTRY_VIEWS = {
+      DE: [51.2, 10.5, 6], FR: [46.5, 2.5, 6], IT: [42.5, 12.5, 6], SE: [62.0, 16.0, 5], NO: [64.5, 14.0, 5], CZ: [49.8, 15.5, 7],
+      ES: [40.4, -3.7, 6], PT: [39.5, -8.0, 7], AT: [47.5, 14.5, 7], BE: [50.6, 4.5, 8], NL: [52.3, 5.3, 8], GR: [39.0, 22.0, 6],
+      PL: [52.0, 19.5, 6], HU: [47.2, 19.0, 7], RO: [45.5, 25.0, 6], BG: [42.7, 25.5, 7], HR: [45.2, 16.5, 7], SK: [48.7, 19.5, 7],
+      SI: [46.1, 14.8, 8], DK: [56.0, 10.5, 7], FI: [64.0, 26.0, 5], EE: [58.8, 25.5, 7], LV: [56.8, 24.6, 7], LT: [55.5, 24.0, 7],
+      LU: [49.7, 6.1, 9], IE: [53.2, -8.0, 7], MT: [35.9, 14.4, 10], CY: [35.0, 33.0, 9]
+    };
+    const ACCENT = {
+      DE: 'linear-gradient(90deg,#2a5c3f,#d4a44e)', FR: 'linear-gradient(90deg,#1a4a7a,#6699cc)',
+      IT: 'linear-gradient(90deg,#7a2020,#cc6644)', SE: 'linear-gradient(90deg,#4a6b8a,#88aacc)',
+      NO: 'linear-gradient(90deg,#7a4a1a,#cc8844)', CZ: 'linear-gradient(90deg,#5a2a6a,#9966bb)',
+      ES: 'linear-gradient(90deg,#8a2a1a,#d4a44e)', PT: 'linear-gradient(90deg,#1a6a3a,#55aa77)',
+      AT: 'linear-gradient(90deg,#6a3a1a,#bb7744)', BE: 'linear-gradient(90deg,#5a4a1a,#bb9933)',
+      NL: 'linear-gradient(90deg,#1a5a6a,#55aacc)', GR: 'linear-gradient(90deg,#1a3a8a,#4477cc)',
+      PL: 'linear-gradient(90deg,#8a1a3a,#cc4466)', HU: 'linear-gradient(90deg,#6a1a5a,#aa5599)',
+      RO: 'linear-gradient(90deg,#1a4a8a,#dd9933)', BG: 'linear-gradient(90deg,#2a4a6a,#5588aa)',
+      HR: 'linear-gradient(90deg,#8a2a2a,#3355aa)', SK: 'linear-gradient(90deg,#1a5a3a,#4499bb)',
+      SI: 'linear-gradient(90deg,#1a4a5a,#3399aa)', DK: 'linear-gradient(90deg,#8a2a4a,#cc4466)',
+      FI: 'linear-gradient(90deg,#1a4a8a,#5588cc)', EE: 'linear-gradient(90deg,#1a4a6a,#5599bb)',
+      LV: 'linear-gradient(90deg,#6a2a4a,#aa5577)', LT: 'linear-gradient(90deg,#4a6a2a,#88aa55)',
+      LU: 'linear-gradient(90deg,#6a5a2a,#bb9944)', IE: 'linear-gradient(90deg,#2a6a4a,#44aa66)',
+      MT: 'linear-gradient(90deg,#8a5a1a,#cc8844)', CY: 'linear-gradient(90deg,#6a4a2a,#bb9955)',
+    };
+
+    const SITES = [
+      // ── GERMANY (51) ──────────────────────────────────────────────────────────
+      { id: 1, name: "Aachen Cathedral", year: 1978, type: "cultural", country: "DE", lat: 50.7753, lng: 6.0839 },
+      { id: 2, name: "Speyer Cathedral", year: 1981, type: "cultural", country: "DE", lat: 49.3172, lng: 8.4430 },
+      { id: 3, name: "Würzburg Residence", year: 1981, type: "cultural", country: "DE", lat: 49.7948, lng: 9.9351 },
+      { id: 4, name: "Pilgrimage Church of Wies", year: 1983, type: "cultural", country: "DE", lat: 47.6836, lng: 10.8903 },
+      { id: 5, name: "Castles of Augustusburg & Falkenlust", year: 1984, type: "cultural", country: "DE", lat: 50.8281, lng: 6.9031 },
+      { id: 6, name: "St Mary's Cathedral & St Michael's, Hildesheim", year: 1985, type: "cultural", country: "DE", lat: 52.1508, lng: 9.9511 },
+      { id: 7, name: "Roman Monuments in Trier", year: 1986, type: "cultural", country: "DE", lat: 49.7488, lng: 6.6372 },
+      { id: 8, name: "Upper Germanic–Raetian Limes", year: 1987, type: "cultural", country: "DE", lat: 49.1500, lng: 9.3300 },
+      { id: 9, name: "Hanseatic City of Lübeck", year: 1987, type: "cultural", country: "DE", lat: 53.8655, lng: 10.6866 },
+      { id: 10, name: "Palaces & Parks of Potsdam and Berlin", year: 1990, type: "cultural", country: "DE", lat: 52.3989, lng: 13.0328 },
+      { id: 11, name: "Abbey and Altenmünster of Lorsch", year: 1991, type: "cultural", country: "DE", lat: 49.6520, lng: 8.5674 },
+      { id: 12, name: "Mines of Rammelsberg & Historic Goslar", year: 1992, type: "cultural", country: "DE", lat: 51.9058, lng: 10.4282 },
+      { id: 13, name: "Town of Bamberg", year: 1993, type: "cultural", country: "DE", lat: 49.8988, lng: 10.9028 },
+      { id: 14, name: "Maulbronn Monastery Complex", year: 1993, type: "cultural", country: "DE", lat: 49.0028, lng: 8.8081 },
+      { id: 15, name: "Collegiate Church & Castle, Quedlinburg", year: 1994, type: "cultural", country: "DE", lat: 51.7878, lng: 11.1465 },
+      { id: 16, name: "Völklingen Ironworks", year: 1994, type: "cultural", country: "DE", lat: 49.2523, lng: 6.8443 },
+      { id: 17, name: "Messel Pit Fossil Site", year: 1995, type: "natural", country: "DE", lat: 49.9286, lng: 8.7561 },
+      { id: 18, name: "Cologne Cathedral", year: 1996, type: "cultural", country: "DE", lat: 50.9413, lng: 6.9583 },
+      { id: 19, name: "Bauhaus Sites in Weimar, Dessau & Bernau", year: 1996, type: "cultural", country: "DE", lat: 51.9745, lng: 11.8301 },
+      { id: 20, name: "Luther Memorials in Eisleben & Wittenberg", year: 1996, type: "cultural", country: "DE", lat: 51.8661, lng: 12.6474 },
+      { id: 21, name: "Classical Weimar", year: 1998, type: "cultural", country: "DE", lat: 50.9793, lng: 11.3230 },
+      { id: 22, name: "Muskauer Park / Park Mużakowski", year: 1999, type: "cultural", country: "DE", lat: 51.5557, lng: 14.9697 },
+      { id: 23, name: "Wartburg Castle", year: 1999, type: "cultural", country: "DE", lat: 50.9668, lng: 10.3046 },
+      { id: 24, name: "Museum Island, Berlin", year: 1999, type: "cultural", country: "DE", lat: 52.5200, lng: 13.3988 },
+      { id: 25, name: "Dessau-Wörlitz Garden Kingdom", year: 2000, type: "cultural", country: "DE", lat: 51.8350, lng: 12.4136 },
+      { id: 26, name: "Monastic Island of Reichenau", year: 2000, type: "cultural", country: "DE", lat: 47.6938, lng: 9.0614 },
+      { id: 27, name: "Zollverein Coal Mine, Essen", year: 2001, type: "cultural", country: "DE", lat: 51.4858, lng: 7.0453 },
+      { id: 28, name: "Historic Centres of Stralsund and Wismar", year: 2002, type: "cultural", country: "DE", lat: 54.0800, lng: 12.5600 },
+      { id: 29, name: "Upper Middle Rhine Valley", year: 2002, type: "cultural", country: "DE", lat: 50.1650, lng: 7.6600 },
+      { id: 30, name: "Regensburg Old Town with Stadtamhof", year: 2006, type: "cultural", country: "DE", lat: 49.0197, lng: 12.0975 },
+      { id: 31, name: "Wadden Sea", year: 2009, type: "natural", country: "DE", lat: 54.7100, lng: 8.7000 },
+      { id: 32, name: "Berlin Modernism Housing Estates", year: 2008, type: "cultural", country: "DE", lat: 52.4950, lng: 13.3300 },
+      { id: 33, name: "Fagus Factory in Alfeld", year: 2011, type: "cultural", country: "DE", lat: 51.9881, lng: 9.8152 },
+      { id: 34, name: "Ancient & Primeval Beech Forests (DE)", year: 2011, type: "natural", country: "DE", lat: 53.6974, lng: 13.4750 },
+      { id: 35, name: "Margravial Opera House, Bayreuth", year: 2012, type: "cultural", country: "DE", lat: 49.9454, lng: 11.5784 },
+      { id: 36, name: "Bergpark Wilhelmshöhe", year: 2013, type: "cultural", country: "DE", lat: 51.3115, lng: 9.3975 },
+      { id: 37, name: "Carolingian Westwork, Corvey", year: 2014, type: "cultural", country: "DE", lat: 51.7703, lng: 9.3914 },
+      { id: 38, name: "Speicherstadt & Kontorhaus, Hamburg", year: 2015, type: "cultural", country: "DE", lat: 53.5441, lng: 9.9929 },
+      { id: 39, name: "Le Corbusier Weissenhof Estate, Stuttgart", year: 2016, type: "cultural", country: "DE", lat: 48.8138, lng: 9.1657 },
+      { id: 40, name: "Prehistoric Cave Art, Swabian Jura", year: 2017, type: "cultural", country: "DE", lat: 48.3951, lng: 9.7611 },
+      { id: 41, name: "Hedeby and Danevirke", year: 2018, type: "cultural", country: "DE", lat: 54.4936, lng: 9.5639 },
+      { id: 42, name: "Naumburg Cathedral", year: 2018, type: "cultural", country: "DE", lat: 51.1539, lng: 11.8050 },
+      { id: 43, name: "Erzgebirge / Krušnohoří Mining Region", year: 2019, type: "cultural", country: "DE", lat: 50.6430, lng: 12.8706 },
+      { id: 44, name: "Water Management System of Augsburg", year: 2019, type: "cultural", country: "DE", lat: 48.3717, lng: 10.8983 },
+      { id: 45, name: "Great Spa Towns — Baden-Baden", year: 2021, type: "cultural", country: "DE", lat: 48.7604, lng: 8.2401 },
+      { id: 46, name: "Mathildenhöhe Darmstadt", year: 2021, type: "cultural", country: "DE", lat: 49.8728, lng: 8.6611 },
+      { id: 47, name: "ShUM Sites of Speyer, Worms and Mainz", year: 2021, type: "cultural", country: "DE", lat: 49.6328, lng: 8.3597 },
+      { id: 48, name: "Danube Limes", year: 2021, type: "cultural", country: "DE", lat: 48.7000, lng: 11.4000 },
+      { id: 49, name: "Residence Ensemble Schwerin", year: 2024, type: "cultural", country: "DE", lat: 53.6251, lng: 11.4139 },
+      { id: 50, name: "Herrnhuter Brüdergemeine Settlements", year: 2024, type: "cultural", country: "DE", lat: 51.0188, lng: 14.7452 },
+      { id: 51, name: "Palaces of King Ludwig II of Bavaria", year: 2025, type: "cultural", country: "DE", lat: 47.5576, lng: 10.7498 },
+      { id: 52, name: "Town Hall and Roland on the Marketplace of Bremen", year: 2004, type: "cultural", country: "DE", lat: 53.0758, lng: 8.8072 },
+      { id: 53, name: "Prehistoric Pile Dwellings around the Alps (DE)", year: 2011, type: "cultural", country: "DE", lat: 47.7500, lng: 9.2500 },
+      { id: 54, name: "Frontiers of the Roman Empire — Lower German Limes", year: 2021, type: "cultural", country: "DE", lat: 51.8500, lng: 6.0000 },
+      { id: 55, name: "Siemensstadt Square Housing Estate, Berlin", year: 2023, type: "cultural", country: "DE", lat: 52.5294, lng: 13.2882 },
+
+      // ── FRANCE (54) ───────────────────────────────────────────────────────────
+      { id: 101, name: "Mont-Saint-Michel and its Bay", year: 1979, type: "cultural", country: "FR", lat: 48.6361, lng: -1.5115 },
+      { id: 102, name: "Palace and Park of Versailles", year: 1979, type: "cultural", country: "FR", lat: 48.8049, lng: 2.1204 },
+      { id: 103, name: "Vézelay, Church and Hill", year: 1979, type: "cultural", country: "FR", lat: 47.4656, lng: 3.7478 },
+      { id: 104, name: "Decorated Grottoes of the Vézère Valley", year: 1979, type: "cultural", country: "FR", lat: 44.9411, lng: 1.0169 },
+      { id: 105, name: "Chartres Cathedral", year: 1979, type: "cultural", country: "FR", lat: 48.4474, lng: 1.4875 },
+      { id: 106, name: "Palace and Park of Fontainebleau", year: 1981, type: "cultural", country: "FR", lat: 48.4025, lng: 2.7016 },
+      { id: 107, name: "Amiens Cathedral", year: 1981, type: "cultural", country: "FR", lat: 49.8941, lng: 2.3017 },
+      { id: 108, name: "Roman Theatre & Triumphal Arch of Orange", year: 1981, type: "cultural", country: "FR", lat: 44.1383, lng: 4.8092 },
+      { id: 109, name: "Arles, Roman and Romanesque Monuments", year: 1981, type: "cultural", country: "FR", lat: 43.6767, lng: 4.6278 },
+      { id: 110, name: "Cistercian Abbey of Fontenay", year: 1981, type: "cultural", country: "FR", lat: 47.6289, lng: 4.3917 },
+      { id: 111, name: "Royal Saltworks of Arc-et-Senans", year: 1982, type: "cultural", country: "FR", lat: 47.0378, lng: 5.7742 },
+      { id: 112, name: "Gulf of Porto — Scandola Nature Reserve", year: 1983, type: "natural", country: "FR", lat: 42.3667, lng: 8.5500 },
+      { id: 113, name: "Place Stanislas, Nancy", year: 1983, type: "cultural", country: "FR", lat: 48.6936, lng: 6.1836 },
+      { id: 114, name: "Abbey Church of Saint-Savin sur Gartempe", year: 1983, type: "cultural", country: "FR", lat: 46.5050, lng: 0.8681 },
+      { id: 115, name: "Pont du Gard", year: 1985, type: "cultural", country: "FR", lat: 43.9474, lng: 4.5353 },
+      { id: 116, name: "Strasbourg — Grande Île and Neustadt", year: 1988, type: "cultural", country: "FR", lat: 48.5833, lng: 7.7458 },
+      { id: 117, name: "Paris, Banks of the Seine", year: 1991, type: "cultural", country: "FR", lat: 48.8566, lng: 2.3522 },
+      { id: 118, name: "Cathedral of Notre-Dame, Reims", year: 1991, type: "cultural", country: "FR", lat: 49.2533, lng: 4.0336 },
+      { id: 119, name: "Bourges Cathedral", year: 1992, type: "cultural", country: "FR", lat: 47.0806, lng: 2.3978 },
+      { id: 120, name: "Historic Centre of Avignon", year: 1995, type: "cultural", country: "FR", lat: 43.9493, lng: 4.8059 },
+      { id: 121, name: "Canal du Midi", year: 1996, type: "cultural", country: "FR", lat: 43.3047, lng: 2.9700 },
+      { id: 122, name: "Historic Fortified City of Carcassonne", year: 1997, type: "cultural", country: "FR", lat: 43.2076, lng: 2.3644 },
+      { id: 123, name: "Pyrénées — Mont Perdu", year: 1997, type: "mixed", country: "FR", lat: 42.6944, lng: 0.0058 },
+      { id: 124, name: "Historic Site of Lyon", year: 1998, type: "cultural", country: "FR", lat: 45.7640, lng: 4.8357 },
+      { id: 125, name: "Routes of Santiago de Compostela in France", year: 1998, type: "cultural", country: "FR", lat: 43.7102, lng: 1.3100 },
+      { id: 126, name: "Loire Valley", year: 2000, type: "cultural", country: "FR", lat: 47.5500, lng: 1.0500 },
+      { id: 127, name: "Provins, Town of Medieval Fairs", year: 2001, type: "cultural", country: "FR", lat: 48.5594, lng: 3.2958 },
+      { id: 128, name: "Jurisdiction of Saint-Emilion", year: 1999, type: "cultural", country: "FR", lat: 44.8944, lng: -0.1553 },
+      { id: 129, name: "Belfries of Belgium and France", year: 1999, type: "cultural", country: "FR", lat: 50.7296, lng: 2.5327 },
+      { id: 130, name: "Le Havre, Rebuilt City", year: 2005, type: "cultural", country: "FR", lat: 49.4944, lng: 0.1079 },
+      { id: 131, name: "Bordeaux, Port of the Moon", year: 2007, type: "cultural", country: "FR", lat: 44.8378, lng: -0.5792 },
+      { id: 132, name: "Vauban Fortifications", year: 2008, type: "cultural", country: "FR", lat: 47.2380, lng: 5.9920 },
+      { id: 133, name: "Causses and the Cévennes", year: 2011, type: "cultural", country: "FR", lat: 44.1000, lng: 3.4000 },
+      { id: 134, name: "Prehistoric Pile Dwellings (Alps, FR)", year: 2011, type: "cultural", country: "FR", lat: 45.8500, lng: 6.1200 },
+      { id: 135, name: "Chauvet-Pont d'Arc Cave", year: 2014, type: "cultural", country: "FR", lat: 44.3900, lng: 4.4156 },
+      { id: 136, name: "Champagne Hillsides, Houses and Cellars", year: 2015, type: "cultural", country: "FR", lat: 49.0500, lng: 3.9300 },
+      { id: 137, name: "Climats, Terroirs of Burgundy", year: 2015, type: "cultural", country: "FR", lat: 47.0700, lng: 4.8500 },
+      { id: 138, name: "Le Corbusier — French Sites", year: 2016, type: "cultural", country: "FR", lat: 47.6180, lng: 6.8270 },
+      { id: 139, name: "Chaîne des Puys — Limagne Fault", year: 2018, type: "natural", country: "FR", lat: 45.7700, lng: 2.9600 },
+      { id: 140, name: "Nice, Winter Resort Town of the Riviera", year: 2021, type: "cultural", country: "FR", lat: 43.7102, lng: 7.2620 },
+      { id: 141, name: "Cordouan Lighthouse", year: 2021, type: "cultural", country: "FR", lat: 45.5839, lng: -1.1728 },
+      { id: 142, name: "Vichy, Great Spa Town of Europe", year: 2021, type: "cultural", country: "FR", lat: 46.1281, lng: 3.4278 },
+      { id: 143, name: "Episcopal City of Albi", year: 2010, type: "cultural", country: "FR", lat: 43.9292, lng: 2.1483 },
+      { id: 144, name: "Funerary & Memory Sites of WWI", year: 2023, type: "cultural", country: "FR", lat: 49.8400, lng: 2.7800 },
+      { id: 145, name: "Megaliths of Carnac", year: 2023, type: "cultural", country: "FR", lat: 47.5983, lng: -3.0669 },
+      { id: 146, name: "Beech Forests of Europe (FR)", year: 2017, type: "natural", country: "FR", lat: 48.4400, lng: 7.1600 },
+      { id: 147, name: "Marquesas Islands — Te Henua Enata", year: 2024, type: "mixed", country: "FR", lat: -9.0000, lng: -139.5000 },
+      { id: 148, name: "Nord-Pas de Calais Mining Basin", year: 2012, type: "cultural", country: "FR", lat: 50.4500, lng: 2.8300 },
+      { id: 149, name: "Maison Carrée of Nîmes", year: 2023, type: "cultural", country: "FR", lat: 43.8380, lng: 4.3600 },
+
+      // ── ITALY (61) ────────────────────────────────────────────────────────────
+      { id: 201, name: "Rock Drawings in Valcamonica", year: 1979, type: "cultural", country: "IT", lat: 45.9750, lng: 10.3500 },
+      { id: 202, name: "Church & Convent of Santa Maria delle Grazie", year: 1980, type: "cultural", country: "IT", lat: 45.4660, lng: 9.1706 },
+      { id: 203, name: "Historic Centre of Florence", year: 1982, type: "cultural", country: "IT", lat: 43.7696, lng: 11.2558 },
+      { id: 204, name: "Venice and its Lagoon", year: 1987, type: "cultural", country: "IT", lat: 45.4408, lng: 12.3155 },
+      { id: 205, name: "Piazza del Duomo, Pisa", year: 1987, type: "cultural", country: "IT", lat: 43.7228, lng: 10.3966 },
+      { id: 206, name: "Historic Centre of San Gimignano", year: 1990, type: "cultural", country: "IT", lat: 43.4672, lng: 11.0430 },
+      { id: 207, name: "I Sassi di Matera", year: 1993, type: "cultural", country: "IT", lat: 40.6664, lng: 16.6043 },
+      { id: 208, name: "City of Vicenza and Palladian Villas", year: 1994, type: "cultural", country: "IT", lat: 45.5455, lng: 11.5354 },
+      { id: 209, name: "Historic Centre of Siena", year: 1995, type: "cultural", country: "IT", lat: 43.3188, lng: 11.3307 },
+      { id: 210, name: "Historic Centre of Naples", year: 1995, type: "cultural", country: "IT", lat: 40.8518, lng: 14.2681 },
+      { id: 211, name: "Ferrara, City of the Renaissance & Po Delta", year: 1995, type: "cultural", country: "IT", lat: 44.8353, lng: 11.6197 },
+      { id: 212, name: "Crespi d'Adda", year: 1995, type: "cultural", country: "IT", lat: 45.6167, lng: 9.5333 },
+      { id: 213, name: "Castel del Monte", year: 1996, type: "cultural", country: "IT", lat: 41.0844, lng: 16.2721 },
+      { id: 214, name: "Trulli of Alberobello", year: 1996, type: "cultural", country: "IT", lat: 40.7850, lng: 17.2394 },
+      { id: 215, name: "Early Christian Monuments of Ravenna", year: 1996, type: "cultural", country: "IT", lat: 44.4184, lng: 12.2035 },
+      { id: 216, name: "Historic Centre of the City of Pienza", year: 1996, type: "cultural", country: "IT", lat: 43.0764, lng: 11.6786 },
+      { id: 217, name: "18th-Century Royal Palace at Caserta", year: 1997, type: "cultural", country: "IT", lat: 41.0741, lng: 14.3294 },
+      { id: 218, name: "Botanical Garden of Padua", year: 1997, type: "cultural", country: "IT", lat: 45.3989, lng: 11.8797 },
+      { id: 219, name: "Cathedral, Torre Civica and Piazza Grande, Modena", year: 1997, type: "cultural", country: "IT", lat: 44.6463, lng: 10.9255 },
+      { id: 220, name: "Archaeological Areas of Pompeii and Herculaneum", year: 1997, type: "cultural", country: "IT", lat: 40.7500, lng: 14.4890 },
+      { id: 221, name: "Amalfi Coast", year: 1997, type: "cultural", country: "IT", lat: 40.6340, lng: 14.6027 },
+      { id: 222, name: "Su Nuraxi di Barumini", year: 1997, type: "cultural", country: "IT", lat: 39.7039, lng: 9.0028 },
+      { id: 223, name: "Portovenere, Cinque Terre, and the Islands", year: 1997, type: "cultural", country: "IT", lat: 44.1000, lng: 9.8000 },
+      { id: 224, name: "Residences of the Royal House of Savoy", year: 1997, type: "cultural", country: "IT", lat: 45.0703, lng: 7.6869 },
+      { id: 225, name: "Archaeological Area of Agrigento", year: 1997, type: "cultural", country: "IT", lat: 37.2912, lng: 13.5874 },
+      { id: 226, name: "Archaeological Landscape of Cilento and Vallo di Diano", year: 1998, type: "cultural", country: "IT", lat: 40.2500, lng: 15.2700 },
+      { id: 227, name: "Historic Centre of Urbino", year: 1998, type: "cultural", country: "IT", lat: 43.7261, lng: 12.6363 },
+      { id: 228, name: "Villa Adriana, Tivoli", year: 1999, type: "cultural", country: "IT", lat: 41.9436, lng: 12.7744 },
+      { id: 229, name: "Historic Centre of Rome", year: 1980, type: "cultural", country: "IT", lat: 41.8902, lng: 12.4922 },
+      { id: 230, name: "Assisi, the Basilica of San Francesco", year: 2000, type: "cultural", country: "IT", lat: 43.0757, lng: 12.6147 },
+      { id: 231, name: "City of Verona", year: 2000, type: "cultural", country: "IT", lat: 45.4384, lng: 10.9916 },
+      { id: 232, name: "Isole Eolie (Aeolian Islands)", year: 2000, type: "natural", country: "IT", lat: 38.5000, lng: 14.9500 },
+      { id: 233, name: "Villa d'Este, Tivoli", year: 2001, type: "cultural", country: "IT", lat: 41.9631, lng: 12.7961 },
+      { id: 234, name: "Monte San Giorgio", year: 2003, type: "natural", country: "IT", lat: 45.9000, lng: 8.9333 },
+      { id: 235, name: "Late Baroque Towns of the Val di Noto", year: 2002, type: "cultural", country: "IT", lat: 37.0000, lng: 14.8000 },
+      { id: 236, name: "Sacri Monti of Piedmont and Lombardy", year: 2003, type: "cultural", country: "IT", lat: 45.8500, lng: 8.5000 },
+      { id: 237, name: "Archaeological Area and Patriarchal Basilica of Aquileia", year: 1998, type: "cultural", country: "IT", lat: 45.7703, lng: 13.3697 },
+      { id: 238, name: "Etruscan Necropolises of Cerveteri and Tarquinia", year: 2004, type: "cultural", country: "IT", lat: 42.0000, lng: 11.8000 },
+      { id: 239, name: "Val d'Orcia", year: 2004, type: "cultural", country: "IT", lat: 43.0000, lng: 11.6000 },
+      { id: 240, name: "Syracuse and Rocky Necropolis of Pantalica", year: 2005, type: "cultural", country: "IT", lat: 37.0692, lng: 15.2866 },
+      { id: 241, name: "Genoa: Le Strade Nuove and Palazzi dei Rolli", year: 2006, type: "cultural", country: "IT", lat: 44.4056, lng: 8.9463 },
+      { id: 242, name: "Mantua and Sabbioneta", year: 2008, type: "cultural", country: "IT", lat: 45.1564, lng: 10.7914 },
+      { id: 243, name: "Rhaetian Railway in the Albula/Bernina Landscapes", year: 2008, type: "cultural", country: "IT", lat: 46.4200, lng: 10.0700 },
+      { id: 244, name: "Dolomites", year: 2009, type: "natural", country: "IT", lat: 46.5000, lng: 11.9000 },
+      { id: 245, name: "Prehistoric Pile Dwellings around the Alps (IT)", year: 2011, type: "cultural", country: "IT", lat: 45.8000, lng: 8.7000 },
+      { id: 246, name: "Longobards in Italy: Places of the Power", year: 2011, type: "cultural", country: "IT", lat: 45.5500, lng: 9.2700 },
+      { id: 247, name: "Medici Villas and Gardens in Tuscany", year: 2013, type: "cultural", country: "IT", lat: 43.8000, lng: 11.2500 },
+      { id: 248, name: "Mount Etna", year: 2013, type: "natural", country: "IT", lat: 37.7510, lng: 14.9934 },
+      { id: 249, name: "Vineyard Landscape of Piedmont", year: 2014, type: "cultural", country: "IT", lat: 44.8000, lng: 8.2000 },
+      { id: 250, name: "Arab-Norman Palermo and Cathedral Churches", year: 2015, type: "cultural", country: "IT", lat: 38.1157, lng: 13.3615 },
+      { id: 251, name: "Le Corbusier — Italian Sites", year: 2016, type: "cultural", country: "IT", lat: 43.2965, lng: 5.3811 },
+      { id: 252, name: "Venetian Works of Defence", year: 2017, type: "cultural", country: "IT", lat: 45.7600, lng: 12.2400 },
+      { id: 253, name: "Beech Forests of Europe (IT)", year: 2017, type: "natural", country: "IT", lat: 41.8600, lng: 14.0500 },
+      { id: 254, name: "Le Colline del Prosecco di Conegliano", year: 2019, type: "cultural", country: "IT", lat: 45.9000, lng: 12.2000 },
+      { id: 255, name: "Padua's 14th-Century Fresco Cycles", year: 2021, type: "cultural", country: "IT", lat: 45.4064, lng: 11.8768 },
+      { id: 256, name: "Porticoes of Bologna", year: 2021, type: "cultural", country: "IT", lat: 44.4938, lng: 11.3430 },
+      { id: 257, name: "Great Spa Towns — Montecatini Terme", year: 2021, type: "cultural", country: "IT", lat: 43.8815, lng: 10.7750 },
+      { id: 258, name: "Via Appia", year: 2024, type: "cultural", country: "IT", lat: 41.8600, lng: 13.5000 },
+      { id: 261, name: "Villa Romana del Casale", year: 1997, type: "cultural", country: "IT", lat: 37.3657, lng: 14.0553 },
+      { id: 259, name: "Evaporitic Karst and Caves, Northern Apennines", year: 2023, type: "natural", country: "IT", lat: 44.2500, lng: 11.4000 },
+      { id: 260, name: "Domus de Janas Necropolises of Sardinia", year: 2025, type: "cultural", country: "IT", lat: 40.4000, lng: 8.9000 },
+
+      // ── SWEDEN (15) ───────────────────────────────────────────────────────────
+      { id: 301, name: "Royal Domain of Drottningholm", year: 1991, type: "cultural", country: "SE", lat: 59.3210, lng: 17.8872 },
+      { id: 302, name: "Birka and Hovgården", year: 1993, type: "cultural", country: "SE", lat: 59.3255, lng: 17.5444 },
+      { id: 303, name: "Engelsberg Ironworks", year: 1993, type: "cultural", country: "SE", lat: 59.6333, lng: 15.9833 },
+      { id: 304, name: "Rock Carvings in Tanum", year: 1994, type: "cultural", country: "SE", lat: 58.7167, lng: 11.3333 },
+      { id: 305, name: "Skogskyrkogården", year: 1994, type: "cultural", country: "SE", lat: 59.3094, lng: 18.0564 },
+      { id: 306, name: "Hanseatic Town of Visby", year: 1995, type: "cultural", country: "SE", lat: 57.6348, lng: 18.2948 },
+      { id: 307, name: "Church Town of Gammelstad, Luleå", year: 1996, type: "cultural", country: "SE", lat: 65.6378, lng: 22.0044 },
+      { id: 308, name: "Laponian Area", year: 1996, type: "mixed", country: "SE", lat: 67.3000, lng: 17.8000 },
+      { id: 309, name: "Naval Port of Karlskrona", year: 1998, type: "cultural", country: "SE", lat: 56.1600, lng: 15.5869 },
+      { id: 310, name: "Agricultural Landscape of Southern Öland", year: 2000, type: "cultural", country: "SE", lat: 56.5500, lng: 16.5667 },
+      { id: 311, name: "High Coast / Kvarken Archipelago", year: 2000, type: "natural", country: "SE", lat: 63.0667, lng: 18.3500 },
+      { id: 312, name: "Falun Mining Area", year: 2001, type: "cultural", country: "SE", lat: 60.6000, lng: 15.6333 },
+      { id: 313, name: "Varberg Radio Station, Grimeton", year: 2004, type: "cultural", country: "SE", lat: 57.1028, lng: 12.3894 },
+      { id: 314, name: "Struve Geodetic Arc (SE)", year: 2005, type: "cultural", country: "SE", lat: 67.4500, lng: 23.6500 },
+      { id: 315, name: "Decorated Farmhouses of Hälsingland", year: 2012, type: "cultural", country: "SE", lat: 61.7000, lng: 16.9000 },
+
+      // ── NORWAY (8) ────────────────────────────────────────────────────────────
+      { id: 401, name: "Urnes Stave Church", year: 1979, type: "cultural", country: "NO", lat: 61.2997, lng: 7.3375 },
+      { id: 402, name: "Bryggen in Bergen", year: 1979, type: "cultural", country: "NO", lat: 60.3975, lng: 5.3242 },
+      { id: 403, name: "Røros Mining Town and the Circumference", year: 1980, type: "cultural", country: "NO", lat: 62.5744, lng: 11.3869 },
+      { id: 404, name: "Rock Art of Alta", year: 1985, type: "cultural", country: "NO", lat: 69.9500, lng: 23.2167 },
+      { id: 405, name: "Vegaøyan — The Vega Archipelago", year: 2004, type: "cultural", country: "NO", lat: 65.6833, lng: 11.9000 },
+      { id: 406, name: "Struve Geodetic Arc (NO)", year: 2005, type: "cultural", country: "NO", lat: 70.6633, lng: 23.6833 },
+      { id: 407, name: "West Norwegian Fjords — Geirangerfjord & Nærøyfjord", year: 2005, type: "natural", country: "NO", lat: 62.1000, lng: 7.0500 },
+      { id: 408, name: "Rjukan–Notodden Industrial Heritage Site", year: 2015, type: "cultural", country: "NO", lat: 59.8781, lng: 8.5939 },
+
+      // ── CZECH REPUBLIC (17) ───────────────────────────────────────────────────
+      { id: 501, name: "Historic Centre of Prague", year: 1992, type: "cultural", country: "CZ", lat: 50.0876, lng: 14.4214 },
+      { id: 502, name: "Historic Centre of Český Krumlov", year: 1992, type: "cultural", country: "CZ", lat: 48.8127, lng: 14.3175 },
+      { id: 503, name: "Historic Centre of Telč", year: 1992, type: "cultural", country: "CZ", lat: 49.1833, lng: 15.4500 },
+      { id: 504, name: "Pilgrimage Church of St John of Nepomuk, Zelená Hora", year: 1994, type: "cultural", country: "CZ", lat: 49.5628, lng: 15.9344 },
+      { id: 505, name: "Kutná Hora: Historical Town Centre", year: 1995, type: "cultural", country: "CZ", lat: 49.9481, lng: 15.2686 },
+      { id: 506, name: "Lednice–Valtice Cultural Landscape", year: 1996, type: "cultural", country: "CZ", lat: 48.7975, lng: 16.8036 },
+      { id: 507, name: "Holašovice Historical Village", year: 1998, type: "cultural", country: "CZ", lat: 48.9356, lng: 14.2903 },
+      { id: 508, name: "Gardens and Castle at Kroměříž", year: 1998, type: "cultural", country: "CZ", lat: 49.2983, lng: 17.3931 },
+      { id: 509, name: "Litomyšl Castle", year: 1999, type: "cultural", country: "CZ", lat: 49.8700, lng: 16.3144 },
+      { id: 510, name: "Holy Trinity Column in Olomouc", year: 2000, type: "cultural", country: "CZ", lat: 49.5938, lng: 17.2508 },
+      { id: 511, name: "Villa Tugendhat, Brno", year: 2001, type: "cultural", country: "CZ", lat: 49.2003, lng: 16.6161 },
+      { id: 512, name: "Jewish Quarter and St Procopius Basilica, Třebíč", year: 2003, type: "cultural", country: "CZ", lat: 49.2147, lng: 15.8797 },
+      { id: 513, name: "Erzgebirge/Krušnohoří Mining Region (CZ)", year: 2019, type: "cultural", country: "CZ", lat: 50.5800, lng: 13.0500 },
+      { id: 514, name: "Landscape for Breeding Kladruber Horses", year: 2019, type: "cultural", country: "CZ", lat: 50.0750, lng: 15.4700 },
+      { id: 515, name: "Great Spa Towns — Bohemian Spa Triangle", year: 2021, type: "cultural", country: "CZ", lat: 50.2297, lng: 12.8716 },
+      { id: 516, name: "Ancient & Primeval Beech Forests (CZ)", year: 2021, type: "natural", country: "CZ", lat: 50.8200, lng: 15.1800 },
+      { id: 517, name: "Žatec and the Landscape of Saaz Hops", year: 2023, type: "cultural", country: "CZ", lat: 50.3269, lng: 13.5472 },
+
+      // ── SPAIN (ES) + 21 MORE EU COUNTRIES ──────────────────────────────────────
+      { id: 601, name: "Mosque-Cathedral and Historic Centre of Córdoba", year: 1984, type: "cultural", country: "ES", lat: 37.8789, lng: -4.7794 },
+      { id: 602, name: "Alhambra, Generalife and Albayzín, Granada", year: 1984, type: "cultural", country: "ES", lat: 37.176, lng: -3.5881 },
+      { id: 603, name: "Burgos Cathedral", year: 1984, type: "cultural", country: "ES", lat: 42.3441, lng: -3.7037 },
+      { id: 604, name: "Monastery and Site of the Escorial", year: 1984, type: "cultural", country: "ES", lat: 40.5872, lng: -4.1481 },
+      { id: 605, name: "Works of Antoni Gaudí", year: 1984, type: "cultural", country: "ES", lat: 41.4036, lng: 2.1744 },
+      { id: 606, name: "Altamira Cave and Paleolithic Cave Art of Northern Spain", year: 1985, type: "cultural", country: "ES", lat: 43.3792, lng: -4.1124 },
+      { id: 607, name: "Old Town of Ávila with its Extra-Muros Churches", year: 1985, type: "cultural", country: "ES", lat: 40.6562, lng: -4.699 },
+      { id: 608, name: "Old Town of Segovia and its Aqueduct", year: 1985, type: "cultural", country: "ES", lat: 40.9488, lng: -4.1184 },
+      { id: 609, name: "Garajonay National Park", year: 1986, type: "natural", country: "ES", lat: 28.1167, lng: -17.2333 },
+      { id: 610, name: "Old Town of Cáceres", year: 1986, type: "cultural", country: "ES", lat: 39.4758, lng: -6.3722 },
+      { id: 611, name: "Cathedral, Alcázar and Archivo de Indias in Seville", year: 1987, type: "cultural", country: "ES", lat: 37.3861, lng: -5.9925 },
+      { id: 612, name: "Old City of Salamanca", year: 1988, type: "cultural", country: "ES", lat: 40.965, lng: -5.6636 },
+      { id: 613, name: "Poblet Monastery", year: 1991, type: "cultural", country: "ES", lat: 41.3871, lng: 1.0714 },
+      { id: 614, name: "Archaeological Ensemble of Mérida", year: 1993, type: "cultural", country: "ES", lat: 38.9199, lng: -6.3447 },
+      { id: 615, name: "Route of Santiago de Compostela in Spain", year: 1993, type: "cultural", country: "ES", lat: 42.8805, lng: -8.5459 },
+      { id: 616, name: "Royal Monastery of Santa María de Guadalupe", year: 1993, type: "cultural", country: "ES", lat: 39.4543, lng: -5.3296 },
+      { id: 617, name: "Doñana National Park", year: 1994, type: "natural", country: "ES", lat: 37.0, lng: -6.4167 },
+      { id: 618, name: "Historic Walled Town of Cuenca", year: 1996, type: "cultural", country: "ES", lat: 40.0706, lng: -2.1374 },
+      { id: 619, name: "Palau de la Música Catalana and Hospital de Sant Pau, Barcelona", year: 1997, type: "cultural", country: "ES", lat: 41.3875, lng: 2.1748 },
+      { id: 620, name: "Pyrénées – Mont Perdu (ES)", year: 1997, type: "mixed", country: "ES", lat: 42.6667, lng: 0.05 },
+      { id: 621, name: "San Millán Yuso and Suso Monasteries", year: 1997, type: "cultural", country: "ES", lat: 42.3167, lng: -2.8667 },
+      { id: 622, name: "Las Médulas", year: 1997, type: "cultural", country: "ES", lat: 42.4667, lng: -6.7667 },
+      { id: 623, name: "Prehistoric Rock Art of the Iberian Mediterranean Basin", year: 1998, type: "cultural", country: "ES", lat: 40.4, lng: -1.0 },
+      { id: 624, name: "Ibiza, Biodiversity and Culture", year: 1999, type: "mixed", country: "ES", lat: 39.0333, lng: 1.5333 },
+      { id: 625, name: "Catalan Romanesque Churches of the Vall de Boí", year: 2000, type: "cultural", country: "ES", lat: 42.5167, lng: 0.8333 },
+      { id: 626, name: "Archaeological Ensemble of Tarraco", year: 2000, type: "cultural", country: "ES", lat: 41.1167, lng: 1.25 },
+      { id: 627, name: "Atapuerca Archaeological Site", year: 2000, type: "cultural", country: "ES", lat: 42.3667, lng: -3.5167 },
+      { id: 628, name: "Aranjuez Cultural Landscape", year: 2001, type: "cultural", country: "ES", lat: 40.0333, lng: -3.6 },
+      { id: 629, name: "Renaissance Monumental Ensembles of Úbeda and Baeza", year: 2003, type: "cultural", country: "ES", lat: 37.9833, lng: -3.3667 },
+      { id: 630, name: "Teide National Park", year: 2007, type: "natural", country: "ES", lat: 28.25, lng: -16.6333 },
+      { id: 631, name: "Tower of Hercules", year: 2009, type: "cultural", country: "ES", lat: 43.3856, lng: -8.4042 },
+      { id: 632, name: "Prehistoric Rock Art Sites — Côa Valley and Siega Verde (ES)", year: 2010, type: "cultural", country: "ES", lat: 40.95, lng: -6.9333 },
+      { id: 633, name: "Landscape of Light — Serra de Tramuntana, Majorca", year: 2011, type: "cultural", country: "ES", lat: 39.75, lng: 2.7833 },
+      { id: 634, name: "Heritage of Mercury — Almadén and Idrija (ES)", year: 2012, type: "cultural", country: "ES", lat: 38.7769, lng: -4.8311 },
+      { id: 635, name: "Prehistoric Rock Art of Risco Caído and Sacred Mountains of Gran Canaria", year: 2019, type: "cultural", country: "ES", lat: 27.9167, lng: -15.6 },
+      { id: 636, name: "Caliphate City of Medina Azahara", year: 2018, type: "cultural", country: "ES", lat: 37.8895, lng: -4.8696 },
+      { id: 637, name: "Menorca Talayótica", year: 2023, type: "cultural", country: "ES", lat: 39.95, lng: 4.1 },
+      { id: 638, name: "Paseo del Prado and Buen Retiro, Madrid", year: 2021, type: "cultural", country: "ES", lat: 40.413, lng: -3.687 },
+      { id: 639, name: "Ancient and Primeval Beech Forests (ES)", year: 2017, type: "natural", country: "ES", lat: 43.0333, lng: -2.7667 },
+      { id: 640, name: "Garajonay National Park (La Gomera)", year: 1986, type: "natural", country: "ES", lat: 28.1167, lng: -17.2333 },
+      { id: 641, name: "Teide National Park (Tenerife)", year: 2007, type: "natural", country: "ES", lat: 28.25, lng: -16.6333 },
+      { id: 642, name: "El Hierro Biosphere (Canary Islands)", year: 2000, type: "natural", country: "ES", lat: 27.7333, lng: -17.9667 },
+      { id: 643, name: "Oviedo and the Kingdom of the Asturias (Pre-Romanesque)", year: 1985, type: "cultural", country: "ES", lat: 43.3614, lng: -5.8456 },
+      { id: 644, name: "Cathedral and Alcázar of Toledo", year: 1986, type: "cultural", country: "ES", lat: 39.8581, lng: -4.0226 },
+      { id: 645, name: "Palmeral of Elche", year: 2000, type: "cultural", country: "ES", lat: 38.2682, lng: -0.6936 },
+      { id: 646, name: "Lugo Roman Walls", year: 2000, type: "cultural", country: "ES", lat: 43.01, lng: -7.5567 },
+      { id: 647, name: "Talayotic Prehistoric Menorca (extension)", year: 2023, type: "cultural", country: "ES", lat: 39.9667, lng: 4.0833 },
+      { id: 648, name: "Vizcaya Bridge (Puente Colgante)", year: 2006, type: "cultural", country: "ES", lat: 43.3211, lng: -3.0083 },
+      { id: 649, name: "Picos de Europa National Park (extension to Doñana)", year: 2006, type: "natural", country: "ES", lat: 43.2, lng: -4.8333 },
+      { id: 650, name: "Risco Caído Cultural Landscape of Gran Canaria", year: 2019, type: "cultural", country: "ES", lat: 27.8833, lng: -15.6 },
+      { id: 701, name: "Central Zone of Angra do Heroísmo in the Azores", year: 1983, type: "cultural", country: "PT", lat: 38.6556, lng: -27.2194 },
+      { id: 702, name: "Monastery of the Hieronymites and Tower of Belém", year: 1983, type: "cultural", country: "PT", lat: 38.6979, lng: -9.2068 },
+      { id: 703, name: "Monastery of Batalha", year: 1983, type: "cultural", country: "PT", lat: 39.6603, lng: -8.8256 },
+      { id: 704, name: "Convent of Christ in Tomar", year: 1983, type: "cultural", country: "PT", lat: 39.6025, lng: -8.4133 },
+      { id: 705, name: "Historic Centre of Évora", year: 1986, type: "cultural", country: "PT", lat: 38.5714, lng: -7.9114 },
+      { id: 706, name: "Monastery of Alcobaça", year: 1989, type: "cultural", country: "PT", lat: 39.5483, lng: -8.9769 },
+      { id: 707, name: "Cultural Landscape of Sintra", year: 1995, type: "cultural", country: "PT", lat: 38.7878, lng: -9.3903 },
+      { id: 708, name: "Historic Centre of Oporto", year: 1996, type: "cultural", country: "PT", lat: 41.1414, lng: -8.6108 },
+      { id: 709, name: "Prehistoric Rock Art Sites in the Côa Valley (PT)", year: 1998, type: "cultural", country: "PT", lat: 41.0833, lng: -7.1333 },
+      { id: 710, name: "Laurisilva of Madeira", year: 1999, type: "natural", country: "PT", lat: 32.7667, lng: -17.0 },
+      { id: 711, name: "Historic Centre of Guimarães", year: 2001, type: "cultural", country: "PT", lat: 41.4436, lng: -8.2978 },
+      { id: 712, name: "Alto Douro Wine Region", year: 2001, type: "cultural", country: "PT", lat: 41.1667, lng: -7.5 },
+      { id: 713, name: "Landscape of the Pico Island Vineyard Culture (Azores)", year: 2004, type: "cultural", country: "PT", lat: 38.4667, lng: -28.3333 },
+      { id: 714, name: "Garrison Border Town of Elvas and its Fortifications", year: 2012, type: "cultural", country: "PT", lat: 38.8792, lng: -7.1636 },
+      { id: 715, name: "University of Coimbra — Alta and Sofia", year: 2013, type: "cultural", country: "PT", lat: 40.2094, lng: -8.4258 },
+      { id: 716, name: "Sanctuary of Bom Jesus do Monte in Braga", year: 2019, type: "cultural", country: "PT", lat: 41.5528, lng: -8.4194 },
+      { id: 717, name: "Royal Building of Mafra — Palace, Basilica, Convent, Tapada", year: 2019, type: "cultural", country: "PT", lat: 38.9394, lng: -9.3267 },
+      { id: 801, name: "Historic Centre of the City of Salzburg", year: 1996, type: "cultural", country: "AT", lat: 47.7971, lng: 13.047 },
+      { id: 802, name: "Palace and Gardens of Schönbrunn", year: 1996, type: "cultural", country: "AT", lat: 48.1847, lng: 16.3122 },
+      { id: 803, name: "Hallstatt-Dachstein / Salzkammergut Cultural Landscape", year: 1997, type: "cultural", country: "AT", lat: 47.5622, lng: 13.6493 },
+      { id: 804, name: "Semmering Railway", year: 1998, type: "cultural", country: "AT", lat: 47.6361, lng: 15.8289 },
+      { id: 805, name: "City of Graz — Historic Centre and Schloss Eggenberg", year: 1999, type: "cultural", country: "AT", lat: 47.0667, lng: 15.45 },
+      { id: 806, name: "Wachau Cultural Landscape", year: 2000, type: "cultural", country: "AT", lat: 48.3667, lng: 15.4167 },
+      { id: 807, name: "Historic Centre of Vienna", year: 2001, type: "cultural", country: "AT", lat: 48.2082, lng: 16.3738 },
+      { id: 808, name: "Fertő / Neusiedlersee Cultural Landscape (AT)", year: 2001, type: "cultural", country: "AT", lat: 47.75, lng: 16.75 },
+      { id: 809, name: "Prehistoric Pile Dwellings around the Alps (AT)", year: 2011, type: "cultural", country: "AT", lat: 47.9, lng: 13.55 },
+      { id: 810, name: "Ancient and Primeval Beech Forests (AT)", year: 2017, type: "natural", country: "AT", lat: 47.7167, lng: 14.0667 },
+      { id: 811, name: "Great Spa Towns of Europe — Bad Ischl (AT)", year: 2021, type: "cultural", country: "AT", lat: 47.7167, lng: 13.6167 },
+      { id: 812, name: "Frontiers of the Roman Empire — Danube Limes (AT)", year: 2021, type: "cultural", country: "AT", lat: 48.2, lng: 15.6333 },
+      { id: 901, name: "Flemish Béguinages", year: 1998, type: "cultural", country: "BE", lat: 51.0278, lng: 3.7189 },
+      { id: 902, name: "La Grand-Place, Brussels", year: 1998, type: "cultural", country: "BE", lat: 50.8467, lng: 4.3525 },
+      { id: 903, name: "Four Lifts on the Canal du Centre", year: 1998, type: "cultural", country: "BE", lat: 50.4556, lng: 4.2 },
+      { id: 904, name: "Belfries of Belgium and France (BE)", year: 1999, type: "cultural", country: "BE", lat: 50.6381, lng: 3.0631 },
+      { id: 905, name: "Historic Centre of Brugge", year: 2000, type: "cultural", country: "BE", lat: 51.2093, lng: 3.2247 },
+      { id: 906, name: "Major Town Houses of Architect Victor Horta, Brussels", year: 2000, type: "cultural", country: "BE", lat: 50.8264, lng: 4.3594 },
+      { id: 907, name: "Neolithic Flint Mines at Spiennes (Mons)", year: 2000, type: "cultural", country: "BE", lat: 50.4333, lng: 3.9833 },
+      { id: 908, name: "Notre-Dame Cathedral in Tournai", year: 2000, type: "cultural", country: "BE", lat: 50.6067, lng: 3.3883 },
+      { id: 909, name: "Plantin-Moretus House-Workshops-Museum Complex", year: 2005, type: "cultural", country: "BE", lat: 51.2194, lng: 4.3983 },
+      { id: 910, name: "Stoclet House", year: 2009, type: "cultural", country: "BE", lat: 50.8406, lng: 4.4183 },
+      { id: 911, name: "Major Mining Sites of Wallonia", year: 2012, type: "cultural", country: "BE", lat: 50.5, lng: 4.1667 },
+      { id: 912, name: "Architectural Work of Le Corbusier (BE)", year: 2016, type: "cultural", country: "BE", lat: 50.8358, lng: 4.3867 },
+      { id: 913, name: "Ancient and Primeval Beech Forests — Sonian Forest (BE)", year: 2017, type: "natural", country: "BE", lat: 50.7667, lng: 4.4167 },
+      { id: 914, name: "Colonies of Benevolence (BE)", year: 2021, type: "cultural", country: "BE", lat: 51.0333, lng: 3.8333 },
+      { id: 915, name: "Great Spa Towns of Europe — Spa (BE)", year: 2021, type: "cultural", country: "BE", lat: 50.485, lng: 5.8656 },
+      { id: 916, name: "Funerary and Memory Sites of the First World War — Western Front (BE)", year: 2023, type: "cultural", country: "BE", lat: 50.8667, lng: 2.8833 },
+      { id: 1001, name: "Schokland and Surroundings", year: 1995, type: "cultural", country: "NL", lat: 52.6333, lng: 5.85 },
+      { id: 1002, name: "Defence Line of Amsterdam", year: 1996, type: "cultural", country: "NL", lat: 52.4167, lng: 4.9167 },
+      { id: 1003, name: "Kinderdijk-Elshout Mill Network", year: 1997, type: "cultural", country: "NL", lat: 51.8833, lng: 4.6333 },
+      { id: 1004, name: "Ir. D.F. Wouda Steam Pumping Station", year: 1998, type: "cultural", country: "NL", lat: 53.1, lng: 5.4667 },
+      { id: 1005, name: "Beemster Polder (Droogmakerij de Beemster)", year: 1999, type: "cultural", country: "NL", lat: 52.5667, lng: 4.9167 },
+      { id: 1006, name: "Rietveld Schröder House", year: 2000, type: "cultural", country: "NL", lat: 52.0847, lng: 5.1433 },
+      { id: 1007, name: "Wadden Sea (NL)", year: 2009, type: "natural", country: "NL", lat: 53.2, lng: 5.4 },
+      { id: 1008, name: "Seventeenth-Century Canal Ring of Amsterdam", year: 2010, type: "cultural", country: "NL", lat: 52.3717, lng: 4.8872 },
+      { id: 1009, name: "Van Nellefabriek (Van Nelle Factory)", year: 2014, type: "cultural", country: "NL", lat: 51.9258, lng: 4.4603 },
+      { id: 1010, name: "Colonies of Benevolence (NL)", year: 2021, type: "cultural", country: "NL", lat: 52.6667, lng: 6.5833 },
+      { id: 1011, name: "Ancient and Primeval Beech Forests (NL)", year: 2021, type: "natural", country: "NL", lat: 52.0833, lng: 5.85 },
+      { id: 1012, name: "New Dutch Water Lines", year: 2021, type: "cultural", country: "NL", lat: 52.25, lng: 5.0 },
+      { id: 1013, name: "Netherlands Farmland Birds", year: 2023, type: "natural", country: "NL", lat: 52.5167, lng: 4.75 },
+      { id: 1101, name: "Temple of Apollo Epicurius at Bassae", year: 1986, type: "cultural", country: "GR", lat: 37.4269, lng: 21.9003 },
+      { id: 1102, name: "Archaeological Site of Delphi", year: 1987, type: "cultural", country: "GR", lat: 38.4822, lng: 22.5011 },
+      { id: 1103, name: "Acropolis of Athens", year: 1987, type: "cultural", country: "GR", lat: 37.9715, lng: 23.7267 },
+      { id: 1104, name: "Mount Athos", year: 1988, type: "mixed", country: "GR", lat: 40.2667, lng: 24.3167 },
+      { id: 1105, name: "Meteora", year: 1988, type: "mixed", country: "GR", lat: 39.7211, lng: 21.6306 },
+      { id: 1106, name: "Paleochristian and Byzantine Monuments of Thessaloniki", year: 1988, type: "cultural", country: "GR", lat: 40.6401, lng: 22.9444 },
+      { id: 1107, name: "Sanctuary of Asklepios at Epidaurus", year: 1988, type: "cultural", country: "GR", lat: 37.5972, lng: 23.0769 },
+      { id: 1108, name: "Medieval City of Rhodes", year: 1988, type: "cultural", country: "GR", lat: 36.4444, lng: 28.2228 },
+      { id: 1109, name: "Archaeological Site of Olympia", year: 1989, type: "cultural", country: "GR", lat: 37.6379, lng: 21.63 },
+      { id: 1110, name: "Mystras Archaeological Site", year: 1989, type: "cultural", country: "GR", lat: 37.0703, lng: 22.3881 },
+      { id: 1111, name: "Delos", year: 1990, type: "cultural", country: "GR", lat: 37.3958, lng: 25.27 },
+      { id: 1112, name: "Monasteries of Daphni, Hosios Loukas and Nea Moni of Chios", year: 1990, type: "cultural", country: "GR", lat: 38.0261, lng: 23.6333 },
+      { id: 1113, name: "Pythagoreion and Heraion of Samos", year: 1992, type: "cultural", country: "GR", lat: 37.6833, lng: 26.9167 },
+      { id: 1114, name: "Vergina — Archaeological Site of Aigai", year: 1996, type: "cultural", country: "GR", lat: 40.4833, lng: 22.3167 },
+      { id: 1115, name: "Archaeological Sites of Mycenae and Tiryns", year: 1999, type: "cultural", country: "GR", lat: 37.7314, lng: 22.7561 },
+      { id: 1116, name: "Historic Centre of Chora with Monastery of Saint-John, Pátmos", year: 1999, type: "cultural", country: "GR", lat: 37.3033, lng: 26.5508 },
+      { id: 1117, name: "Old Town of Corfu", year: 2007, type: "cultural", country: "GR", lat: 39.6233, lng: 19.9222 },
+      { id: 1118, name: "Archaeological Site of Philippi", year: 2016, type: "cultural", country: "GR", lat: 41.0111, lng: 24.2889 },
+      { id: 1119, name: "Ancient and Primeval Beech Forests (GR)", year: 2017, type: "natural", country: "GR", lat: 40.9833, lng: 22.3 },
+      { id: 1120, name: "Minoan Palatial Centres of Crete", year: 2025, type: "cultural", country: "GR", lat: 35.2983, lng: 25.1631 },
+      { id: 1201, name: "Historic Centre of Kraków", year: 1978, type: "cultural", country: "PL", lat: 50.0614, lng: 19.9372 },
+      { id: 1202, name: "Wieliczka and Bochnia Royal Salt Mines", year: 1978, type: "cultural", country: "PL", lat: 49.9833, lng: 20.0586 },
+      { id: 1203, name: "Auschwitz Birkenau — Nazi Concentration and Extermination Camp", year: 1979, type: "cultural", country: "PL", lat: 50.0272, lng: 19.2036 },
+      { id: 1204, name: "Białowieża Forest (PL)", year: 1979, type: "natural", country: "PL", lat: 52.7, lng: 23.8333 },
+      { id: 1205, name: "Historic Centre of Warsaw", year: 1980, type: "cultural", country: "PL", lat: 52.25, lng: 21.0122 },
+      { id: 1206, name: "Old City of Zamość", year: 1992, type: "cultural", country: "PL", lat: 50.7233, lng: 23.2519 },
+      { id: 1207, name: "Castle of the Teutonic Order in Malbork", year: 1997, type: "cultural", country: "PL", lat: 54.0394, lng: 19.0297 },
+      { id: 1208, name: "Medieval Town of Toruń", year: 1997, type: "cultural", country: "PL", lat: 53.0103, lng: 18.6047 },
+      { id: 1209, name: "Kalwaria Zebrzydowska: Mannerist Architectural and Park Landscape", year: 1999, type: "cultural", country: "PL", lat: 49.8764, lng: 19.6872 },
+      { id: 1210, name: "Churches of Peace in Jawor and Świdnica", year: 2001, type: "cultural", country: "PL", lat: 50.8892, lng: 16.2192 },
+      { id: 1211, name: "Wooden Churches of Southern Little Poland", year: 2003, type: "cultural", country: "PL", lat: 49.7333, lng: 21.2667 },
+      { id: 1212, name: "Muskauer Park / Park Mużakowski (PL)", year: 2004, type: "cultural", country: "PL", lat: 51.5608, lng: 14.9528 },
+      { id: 1213, name: "Centennial Hall in Wrocław", year: 2006, type: "cultural", country: "PL", lat: 51.1067, lng: 17.0772 },
+      { id: 1214, name: "Wooden Tserkvas of the Carpathian Region (PL)", year: 2013, type: "cultural", country: "PL", lat: 49.65, lng: 22.0833 },
+      { id: 1215, name: "Tarnowskie Góry Lead-Silver-Zinc Mine and Underground Water Management System", year: 2017, type: "cultural", country: "PL", lat: 50.45, lng: 18.8667 },
+      { id: 1216, name: "Krzemionki Prehistoric Striped Flint Mining Region", year: 2019, type: "cultural", country: "PL", lat: 51.0122, lng: 21.2203 },
+      { id: 1217, name: "Ancient and Primeval Beech Forests — Bieszczady (PL)", year: 2021, type: "natural", country: "PL", lat: 49.1333, lng: 22.55 },
+      { id: 1301, name: "Budapest — Danube Banks, Buda Castle Quarter and Andrássy Avenue", year: 1987, type: "cultural", country: "HU", lat: 47.4979, lng: 19.0402 },
+      { id: 1302, name: "Hollókő Traditional Village", year: 1987, type: "cultural", country: "HU", lat: 47.9978, lng: 19.5931 },
+      { id: 1303, name: "Caves of Aggtelek Karst and Slovak Karst (HU)", year: 1995, type: "natural", country: "HU", lat: 48.4667, lng: 20.5167 },
+      { id: 1304, name: "Millenary Benedictine Abbey of Pannonhalma", year: 1996, type: "cultural", country: "HU", lat: 47.5542, lng: 17.7644 },
+      { id: 1305, name: "Hortobágy National Park — The Puszta", year: 1999, type: "cultural", country: "HU", lat: 47.5833, lng: 21.1667 },
+      { id: 1306, name: "Early Christian Necropolis of Pécs (Sopianae)", year: 2000, type: "cultural", country: "HU", lat: 46.0761, lng: 18.2294 },
+      { id: 1307, name: "Fertő / Neusiedlersee Cultural Landscape (HU)", year: 2001, type: "cultural", country: "HU", lat: 47.6667, lng: 16.8333 },
+      { id: 1308, name: "Tokaj Wine Region Historic Cultural Landscape", year: 2002, type: "cultural", country: "HU", lat: 48.1167, lng: 21.4 },
+      { id: 1401, name: "Danube Delta", year: 1991, type: "natural", country: "RO", lat: 45.0833, lng: 29.6167 },
+      { id: 1402, name: "Biertan and its Fortified Church", year: 1993, type: "cultural", country: "RO", lat: 46.1283, lng: 24.5197 },
+      { id: 1403, name: "Monastery of Horezu", year: 1993, type: "cultural", country: "RO", lat: 45.1733, lng: 24.0017 },
+      { id: 1404, name: "Churches of Moldavia", year: 1993, type: "cultural", country: "RO", lat: 47.5, lng: 25.8333 },
+      { id: 1405, name: "Sighișoara Historic Centre", year: 1999, type: "cultural", country: "RO", lat: 46.2178, lng: 24.7919 },
+      { id: 1406, name: "Dacian Fortresses of the Orăștie Mountains", year: 1999, type: "cultural", country: "RO", lat: 45.6167, lng: 23.1333 },
+      { id: 1407, name: "Wooden Churches of the Maramureș", year: 1999, type: "cultural", country: "RO", lat: 47.7167, lng: 23.8833 },
+      { id: 1408, name: "Ancient and Primeval Beech Forests (RO)", year: 2017, type: "natural", country: "RO", lat: 47.5833, lng: 24.5333 },
+      { id: 1409, name: "Roșia Montană Mining Landscape", year: 2021, type: "cultural", country: "RO", lat: 46.2944, lng: 23.1408 },
+      { id: 1410, name: "Brâncuși Monumental Ensemble in Târgu Jiu", year: 2023, type: "cultural", country: "RO", lat: 44.9667, lng: 23.3167 },
+      { id: 1501, name: "Boyana Church", year: 1979, type: "cultural", country: "BG", lat: 42.63, lng: 23.26 },
+      { id: 1502, name: "Madara Rider", year: 1979, type: "cultural", country: "BG", lat: 43.2797, lng: 27.1281 },
+      { id: 1503, name: "Rock-Hewn Churches of Ivanovo", year: 1979, type: "cultural", country: "BG", lat: 43.7167, lng: 25.9667 },
+      { id: 1504, name: "Thracian Tomb of Kazanlak", year: 1979, type: "cultural", country: "BG", lat: 42.6167, lng: 25.3833 },
+      { id: 1505, name: "Ancient City of Nessebar", year: 1983, type: "cultural", country: "BG", lat: 42.6606, lng: 27.7311 },
+      { id: 1506, name: "Srebarna Nature Reserve", year: 1983, type: "natural", country: "BG", lat: 44.1, lng: 27.05 },
+      { id: 1507, name: "Pirin National Park", year: 1983, type: "natural", country: "BG", lat: 41.7167, lng: 23.5833 },
+      { id: 1508, name: "Rila Monastery", year: 1983, type: "cultural", country: "BG", lat: 42.1342, lng: 23.3408 },
+      { id: 1509, name: "Thracian Tomb of Sveshtari", year: 1985, type: "cultural", country: "BG", lat: 43.7783, lng: 26.5875 },
+      { id: 1510, name: "Ancient and Primeval Beech Forests (BG)", year: 2017, type: "natural", country: "BG", lat: 41.9333, lng: 23.6667 },
+      { id: 1601, name: "Old City of Dubrovnik", year: 1979, type: "cultural", country: "HR", lat: 42.6507, lng: 18.0944 },
+      { id: 1602, name: "Plitvice Lakes National Park", year: 1979, type: "natural", country: "HR", lat: 44.8654, lng: 15.6217 },
+      { id: 1603, name: "Episcopal Complex of the Euphrasian Basilica in Poreč", year: 1997, type: "cultural", country: "HR", lat: 45.2272, lng: 13.5933 },
+      { id: 1604, name: "Historic City of Trogir", year: 1997, type: "cultural", country: "HR", lat: 43.5167, lng: 16.25 },
+      { id: 1605, name: "Cathedral of St James in Šibenik", year: 2000, type: "cultural", country: "HR", lat: 43.735, lng: 15.8908 },
+      { id: 1606, name: "Stari Grad Plain on Hvar Island", year: 2008, type: "cultural", country: "HR", lat: 43.1833, lng: 16.6 },
+      { id: 1607, name: "Stećci Medieval Tombstones (HR)", year: 2016, type: "cultural", country: "HR", lat: 44.1, lng: 16.5 },
+      { id: 1608, name: "Venetian Works of Defence — Pula and Zadar (HR)", year: 2017, type: "cultural", country: "HR", lat: 44.8667, lng: 13.85 },
+      { id: 1609, name: "Ancient and Primeval Beech Forests (HR)", year: 2017, type: "natural", country: "HR", lat: 44.8667, lng: 15.6 },
+      { id: 1610, name: "Drvišica and Gorski Kotar Old-Growth Forests (HR extension)", year: 2021, type: "natural", country: "HR", lat: 45.3833, lng: 14.9667 },
+      { id: 1701, name: "Banská Štiavnica and the Technical Monuments in its Vicinity", year: 1993, type: "cultural", country: "SK", lat: 48.4586, lng: 18.8953 },
+      { id: 1702, name: "Levoča, Spišský Hrad and Associated Cultural Monuments", year: 1993, type: "cultural", country: "SK", lat: 49.0194, lng: 20.5883 },
+      { id: 1703, name: "Caves of Aggtelek Karst and Slovak Karst (SK)", year: 1995, type: "natural", country: "SK", lat: 48.5667, lng: 20.5167 },
+      { id: 1704, name: "Vlkolínec Traditional Village", year: 1993, type: "cultural", country: "SK", lat: 48.9917, lng: 19.1917 },
+      { id: 1705, name: "Bardejov Town Conservation Reserve", year: 2000, type: "cultural", country: "SK", lat: 49.2944, lng: 21.2736 },
+      { id: 1706, name: "Wooden Churches of the Slovak Carpathians", year: 2008, type: "cultural", country: "SK", lat: 49.1667, lng: 21.8333 },
+      { id: 1707, name: "Ancient and Primeval Beech Forests — Slovak Carpathians", year: 2007, type: "natural", country: "SK", lat: 48.8333, lng: 22.4167 },
+      { id: 1708, name: "Frontiers of the Roman Empire — Danube Limes (SK)", year: 2021, type: "cultural", country: "SK", lat: 48.1, lng: 17.15 },
+      { id: 1801, name: "Škocjan Caves", year: 1986, type: "natural", country: "SI", lat: 45.6633, lng: 13.9906 },
+      { id: 1802, name: "Heritage of Mercury — Almadén and Idrija (SI)", year: 2012, type: "cultural", country: "SI", lat: 46.0011, lng: 14.0275 },
+      { id: 1803, name: "Prehistoric Pile Dwellings around the Alps (SI)", year: 2011, type: "cultural", country: "SI", lat: 46.3667, lng: 14.3 },
+      { id: 1804, name: "Ancient and Primeval Beech Forests (SI)", year: 2017, type: "natural", country: "SI", lat: 46.35, lng: 14.5833 },
+      { id: 1805, name: "Works of Jože Plečnik in Ljubljana", year: 2021, type: "cultural", country: "SI", lat: 46.0514, lng: 14.5058 },
+      { id: 1901, name: "Jelling Mounds, Runic Stones and Church", year: 1994, type: "cultural", country: "DK", lat: 55.7567, lng: 9.4208 },
+      { id: 1902, name: "Roskilde Cathedral", year: 1995, type: "cultural", country: "DK", lat: 55.6422, lng: 12.0808 },
+      { id: 1903, name: "Kronborg Castle", year: 2000, type: "cultural", country: "DK", lat: 56.0361, lng: 12.6211 },
+      { id: 1904, name: "Ilulissat Icefjord (Greenland)", year: 2004, type: "natural", country: "DK", lat: 69.2667, lng: -51.1 },
+      { id: 1905, name: "Wadden Sea (DK)", year: 2009, type: "natural", country: "DK", lat: 55.3333, lng: 8.3333 },
+      { id: 1906, name: "Stevns Klint", year: 2014, type: "natural", country: "DK", lat: 55.2933, lng: 12.4508 },
+      { id: 1907, name: "Christiansfeld, a Moravian Church Settlement", year: 2015, type: "cultural", country: "DK", lat: 55.3583, lng: 9.4833 },
+      { id: 1908, name: "Kujataa Greenland — Norse and Inuit Farming", year: 2017, type: "cultural", country: "DK", lat: 60.8667, lng: -46.2333 },
+      { id: 1909, name: "Aasivissuit–Nipisat, Inuit Hunting Ground (Greenland)", year: 2018, type: "cultural", country: "DK", lat: 68.0, lng: -52.0 },
+      { id: 1910, name: "Herrnhut, Birthplace of the Moravian Church (DK — Gracehill)", year: 2024, type: "cultural", country: "DK", lat: 55.3583, lng: 9.49 },
+      { id: 2001, name: "Fortress of Suomenlinna", year: 1991, type: "cultural", country: "FI", lat: 60.145, lng: 24.9878 },
+      { id: 2002, name: "Old Rauma", year: 1991, type: "cultural", country: "FI", lat: 61.1286, lng: 21.5064 },
+      { id: 2003, name: "Petäjävesi Old Church", year: 1994, type: "cultural", country: "FI", lat: 62.2567, lng: 24.4917 },
+      { id: 2004, name: "Verla Groundwood and Board Mill", year: 1996, type: "cultural", country: "FI", lat: 60.8667, lng: 26.6167 },
+      { id: 2005, name: "Bronze Age Burial Site of Sammallahdenmäki", year: 1999, type: "cultural", country: "FI", lat: 61.3167, lng: 22.0 },
+      { id: 2006, name: "High Coast / Kvarken Archipelago (FI)", year: 2006, type: "natural", country: "FI", lat: 63.0, lng: 21.0 },
+      { id: 2007, name: "Struve Geodetic Arc (FI)", year: 2005, type: "cultural", country: "FI", lat: 60.1636, lng: 23.8925 },
+      { id: 2101, name: "Historic Centre (Old Town) of Tallinn", year: 1997, type: "cultural", country: "EE", lat: 59.437, lng: 24.7453 },
+      { id: 2102, name: "Struve Geodetic Arc (EE)", year: 2005, type: "cultural", country: "EE", lat: 58.8389, lng: 26.6083 },
+      { id: 2103, name: "Ancient and Primeval Beech Forests (EE)", year: 2021, type: "natural", country: "EE", lat: 57.7333, lng: 26.4833 },
+      { id: 2201, name: "Historic Centre of Riga", year: 1997, type: "cultural", country: "LV", lat: 56.9489, lng: 24.1064 },
+      { id: 2202, name: "Struve Geodetic Arc (LV)", year: 2005, type: "cultural", country: "LV", lat: 57.5344, lng: 25.3239 },
+      { id: 2203, name: "Decorated Farm Steads of Kurzeme", year: 2023, type: "cultural", country: "LV", lat: 57.0833, lng: 22.5167 },
+      { id: 2204, name: "Ancient and Primeval Beech Forests (LV)", year: 2021, type: "natural", country: "LV", lat: 57.1833, lng: 24.85 },
+      { id: 2301, name: "Vilnius Historic Centre", year: 1994, type: "cultural", country: "LT", lat: 54.6872, lng: 25.2797 },
+      { id: 2302, name: "Curonian Spit (LT)", year: 2000, type: "cultural", country: "LT", lat: 55.4167, lng: 21.1333 },
+      { id: 2303, name: "Kernavė Archaeological Site", year: 2004, type: "cultural", country: "LT", lat: 54.8833, lng: 24.8333 },
+      { id: 2304, name: "Struve Geodetic Arc (LT)", year: 2005, type: "cultural", country: "LT", lat: 54.2422, lng: 23.8953 },
+      { id: 2305, name: "Ancient Beech Forests (LT)", year: 2021, type: "natural", country: "LT", lat: 55.5167, lng: 22.0833 },
+      { id: 2401, name: "City of Luxembourg: its Old Quarters and Fortifications", year: 1994, type: "cultural", country: "LU", lat: 49.6117, lng: 6.1319 },
+      { id: 2501, name: "Brú na Bóinne — Archaeological Ensemble of the Bend of the Boyne", year: 1993, type: "cultural", country: "IE", lat: 53.6942, lng: -6.4756 },
+      { id: 2502, name: "Skellig Michael", year: 1996, type: "cultural", country: "IE", lat: 51.7714, lng: -10.5397 },
+      { id: 2601, name: "City of Valletta", year: 1980, type: "cultural", country: "MT", lat: 35.8989, lng: 14.5122 },
+      { id: 2602, name: "Ħal Saflieni Hypogeum", year: 1980, type: "cultural", country: "MT", lat: 35.8697, lng: 14.51 },
+      { id: 2603, name: "Megalithic Temples of Malta", year: 1980, type: "cultural", country: "MT", lat: 35.8272, lng: 14.4433 },
+      { id: 2701, name: "Paphos", year: 1980, type: "cultural", country: "CY", lat: 34.7658, lng: 32.4236 },
+      { id: 2702, name: "Painted Churches in the Troodos Region", year: 1985, type: "cultural", country: "CY", lat: 34.9167, lng: 33.0 },
+      { id: 2703, name: "Choirokoitia Neolithic Settlement", year: 1998, type: "cultural", country: "CY", lat: 34.7961, lng: 33.3425 },
+    ];
+
+    // ── Supabase ──────────────────────────────────────────────────────────────────
+    const _supa = supabase.createClient('https://ddtzpwwnwslcswawbjud.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkdHpwd3dud3NsY3N3YXdianVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3ODcxNTksImV4cCI6MjA4ODM2MzE1OX0.RFeRHSJwzTDvLtTQ8izwhK0-7l4ofcdZkZnjV09BIc4');
+    let _user = null;
+
+    // ── State ─────────────────────────────────────────────────────────────────────
+    let visited = new Set();
+    try { visited = new Set(JSON.parse(localStorage.getItem('eu_v4') || '[]')) } catch (e) { }
+    let filter = 'all', activeCountry = null, searchQ = '', focusedId = null, markers = {};
+
+    // ── Auth helpers ──────────────────────────────────────────────────────────────
+    let _authMode = 'signin';
+    function showAuth() { document.getElementById('auth-overlay').classList.remove('hidden'); }
+    function hideAuth() { document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('auth-err').textContent = ''; }
+    function toggleAuthMode() {
+      _authMode = _authMode === 'signin' ? 'signup' : 'signin';
+      document.querySelector('.auth-title').textContent = _authMode === 'signin' ? 'Welcome back' : 'Create account';
+      document.querySelector('.auth-sub').textContent = _authMode === 'signin' ? 'Sign in to sync your visited sites' : 'Sign up to sync your visited sites';
+      document.getElementById('auth-submit').textContent = _authMode === 'signin' ? 'Sign in' : 'Create account';
+      document.querySelector('#auth-toggle span').textContent = _authMode === 'signin' ? 'Create one' : 'Sign in instead';
+      document.querySelector('.auth-toggle').innerHTML = _authMode === 'signin' ? 'No account? <span onclick="toggleAuthMode()">Create one</span>' : 'Have an account? <span onclick="toggleAuthMode()">Sign in instead</span>';
+    }
+    window.showAuth = showAuth; window.toggleAuthMode = toggleAuthMode;
+
+    document.getElementById('auth-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) hideAuth(); });
+
+    document.getElementById('auth-submit').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-pass').value;
+      const btn = document.getElementById('auth-submit');
+      const errEl = document.getElementById('auth-err');
+      if (!email || !pass) { errEl.textContent = 'Please enter email and password.'; return; }
+      btn.disabled = true; btn.textContent = 'Please wait…'; errEl.textContent = '';
+      const fn = _authMode === 'signin' ? _supa.auth.signInWithPassword.bind(_supa.auth) : _supa.auth.signUp.bind(_supa.auth);
+      const { error } = await fn({ email, password: pass });
+      btn.disabled = false; btn.textContent = _authMode === 'signin' ? 'Sign in' : 'Create account';
+      if (error) { errEl.textContent = error.message; return; }
+      if (_authMode === 'signup') { errEl.style.color = 'var(--nat)'; errEl.textContent = 'Check your email to confirm your account!'; return; }
+      hideAuth();
+    });
+
+    async function signOut() {
+      await _supa.auth.signOut();
+      _user = null;
+      setUserUI(null);
+      // Fall back to localStorage
+      try { visited = new Set(JSON.parse(localStorage.getItem('eu_v4') || '[]')) } catch (e) { visited = new Set(); }
+      renderList(); updateStats();
+    }
+    window.signOut = signOut;
+
+    function setUserUI(user) {
+      const pill = document.getElementById('user-pill');
+      const loginBtn = document.getElementById('login-btn');
+      if (user) {
+        document.getElementById('user-email').textContent = user.email;
+        pill.classList.remove('hidden'); loginBtn.classList.add('hidden');
+      } else {
+        pill.classList.add('hidden'); loginBtn.classList.remove('hidden');
+      }
+    }
+
+    async function loadVisitedFromCloud() {
+      if (!_user) return;
+      const { data } = await _supa.from('visited_sites').select('site_ids').eq('id', _user.id).single();
+      if (data?.site_ids) {
+        visited = new Set(data.site_ids);
+        // Refresh all markers
+        SITES.forEach(s => { if (markers[s.id]) markers[s.id].setIcon(makeIcon(s, focusedId === s.id)); });
+        renderList(); updateStats();
+      }
+    }
+
+    async function saveVisitedToCloud() {
+      if (!_user) return;
+      await _supa.from('visited_sites').upsert({ id: _user.id, site_ids: [...visited], updated_at: new Date().toISOString() });
+    }
+
+    // Listen for auth state changes
+    _supa.auth.onAuthStateChange(async (event, session) => {
+      _user = session?.user ?? null;
+      setUserUI(_user);
+      if (_user) await loadVisitedFromCloud();
+    });
+
+
+    // ── Map ───────────────────────────────────────────────────────────────────────
+    const EUROPE_BOUNDS = L.latLngBounds(L.latLng(34.0, -28), L.latLng(72.0, 45));
+    const map = L.map('map', { center: [54.0, 12.0], zoom: 4, minZoom: 4, maxZoom: 17, maxBounds: EUROPE_BOUNDS, maxBoundsViscosity: 0.88 });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd', maxZoom: 19
+    }).addTo(map);
+
+    const OUTLINE_STYLE = {
+      DE: { color: '#2a5c3f', fillColor: '#2a5c3f', fillOpacity: .05, weight: 1.4, opacity: .45 },
+      FR: { color: '#1a4a7a', fillColor: '#1a4a7a', fillOpacity: .05, weight: 1.4, opacity: .45 },
+      IT: { color: '#7a2020', fillColor: '#7a2020', fillOpacity: .05, weight: 1.4, opacity: .45 },
+      SE: { color: '#4a6b8a', fillColor: '#4a6b8a', fillOpacity: .05, weight: 1.4, opacity: .45 },
+      NO: { color: '#7a4a1a', fillColor: '#7a4a1a', fillOpacity: .05, weight: 1.4, opacity: .45 },
+      CZ: { color: '#5a2a6a', fillColor: '#5a2a6a', fillOpacity: .05, weight: 1.4, opacity: .45 },
+    };
+    fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+      .then(r => r.json())
+      .then(data => {
+        ['DE', 'FR', 'IT', 'SE', 'NO', 'CZ'].forEach(code => {
+          const feat = data.features.find(f => f.properties.ISO_A2 === code);
+          if (feat) L.geoJSON(feat, { style: OUTLINE_STYLE[code] }).addTo(map);
+        });
+      }).catch(() => { });
+
+    // ── Icon factory ──────────────────────────────────────────────────────────────
+    function makeIcon(site, isFocused) {
+      const isV = visited.has(site.id);
+      const r = isFocused ? 9 : 6, total = r * 2 + 8, cx = total / 2, cy = total / 2;
+      const cc = COUNTRY_COLORS[site.country];
+      const fill = isV ? (site.type === 'natural' ? '#1a5c47' : cc.fill) : '#f7f3ec';
+      const stroke = isV ? (site.type === 'natural' ? '#0d3028' : cc.stroke) : '#8c8579';
+      const shine = isV ? `<circle cx="${cx - r * .22}" cy="${cy - r * .22}" r="${r * .28}" fill="rgba(255,255,255,0.28)"/>` : '';
+      const ring = isFocused ? `<circle cx="${cx}" cy="${cy}" r="${r + 2.5}" fill="none" stroke="#b8842a" stroke-width="1.8" opacity="0.75"/>` : '';
+      return L.divIcon({
+        className: '', iconSize: [total, total], iconAnchor: [cx, cy], popupAnchor: [0, -(r + 6)],
+        html: `<svg width="${total}" height="${total}" viewBox="0 0 ${total} ${total}" xmlns="http://www.w3.org/2000/svg">
+      <defs><filter id="sh${r}${isV ? 1 : 0}${site.country}"><feDropShadow dx="0" dy="1" stdDeviation="${isFocused ? 2.5 : 1.2}" flood-color="rgba(0,0,0,${isFocused ? .28 : .16})"/></filter></defs>
+      ${ring}<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="1.4" filter="url(#sh${r}${isV ? 1 : 0}${site.country})"/>${shine}
+    </svg>`
+      });
+    }
+
+    // ── AI enrichment cache ───────────────────────────────────────────────────────
+    const enrichCache = {};
+
+    async function fetchEnrichment(site) {
+      if (enrichCache[site.id]) return enrichCache[site.id];
+
+      // Fetch description from Claude and image from Wikimedia simultaneously
+      const [claudeRes, imgUrl] = await Promise.all([
+        fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 1000,
+            messages: [{
+              role: "user",
+              content: `Write a vivid, engaging 2-3 sentence description of the UNESCO World Heritage Site "${site.name}" in ${COUNTRY_NAMES[site.country]} (inscribed ${site.year}). Explain what makes it extraordinary and why it deserved UNESCO recognition. Be evocative and specific — mention striking visual details, historical significance, or unique qualities. Do not start with the site name. Plain text only, no markdown.`
+            }]
+          })
+        }).then(r => r.json()).then(d => d.content?.[0]?.text || "").catch(() => ""),
+
+        fetchWikimediaImage(site)
+      ]);
+
+      const result = { desc: claudeRes, imgUrl };
+      enrichCache[site.id] = result;
+      return result;
+    }
+
+    async function fetchWikimediaImage(site) {
+      // Build a search query tailored to the site
+      const query = `${site.name} ${COUNTRY_NAMES[site.country]}`;
+      try {
+        const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(site.name)}&prop=pageimages&piprop=original&pithumbsize=600&format=json&origin=*`;
+        const r = await fetch(searchUrl);
+        const d = await r.json();
+        const pages = d.query?.pages || {};
+        const page = Object.values(pages)[0];
+        if (page?.original?.source) return page.original.source;
+        if (page?.thumbnail?.source) return page.thumbnail.source;
+        // Fallback: search for the page first
+        const s2 = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&prop=pageimages&format=json&origin=*`);
+        const d2 = await s2.json();
+        const title = d2.query?.search?.[0]?.title;
+        if (!title) return null;
+        const s3 = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&piprop=original&pithumbsize=600&format=json&origin=*`);
+        const d3 = await s3.json();
+        const pages3 = d3.query?.pages || {};
+        const page3 = Object.values(pages3)[0];
+        return page3?.original?.source || page3?.thumbnail?.source || null;
+      } catch (e) { return null; }
+    }
+
+    function popupContent(site) {
+      const v = visited.has(site.id);
+      const skelRows = `<div class="pup-desc-loading"><span></span><span></span><span></span><span></span></div>`;
+      return `
+    <div class="pup-img-wrap" id="pup-img-${site.id}">
+      <div class="pup-img-skeleton" id="pup-skel-${site.id}"></div>
+    </div>
+    <div class="pup-accent" style="background:${ACCENT[site.country]}"></div>
+    <div class="pup-body">
+      <div class="pup-name">${site.name}</div>
+      <div class="pup-meta">UNESCO ${site.year} · ${site.type} · ${COUNTRY_NAMES[site.country]}</div>
+      <div id="pup-desc-${site.id}">${skelRows}</div>
+      <div class="pup-foot">
+        <span class="pup-status ${v ? 'v' : 'u'}" id="pup-status-${site.id}">${v ? '✓ Visited' : '○ Not visited'}</span>
+        <button class="pup-btn${v ? ' vbtn' : ''}" id="pup-btn-${site.id}" onclick="toggleV(${site.id})">${v ? 'Mark unvisited' : 'Mark visited'}</button>
+      </div>
+    </div>`;
+    }
+
+    function updatePopupVisitedState(id) {
+      const v = visited.has(id);
+      const statusEl = document.getElementById(`pup-status-${id}`);
+      const btnEl = document.getElementById(`pup-btn-${id}`);
+      if (statusEl) {
+        statusEl.className = `pup-status ${v ? 'v' : 'u'}`;
+        statusEl.textContent = v ? '✓ Visited' : '○ Not visited';
+      }
+      if (btnEl) {
+        btnEl.className = `pup-btn${v ? ' vbtn' : ''}`;
+        btnEl.textContent = v ? 'Mark unvisited' : 'Mark visited';
+      }
+    }
+
+    async function enrichPopup(site) {
+      const { desc, imgUrl } = await fetchEnrichment(site);
+
+      // Inject description
+      const descEl = document.getElementById(`pup-desc-${site.id}`);
+      if (descEl) descEl.innerHTML = `<div class="pup-desc">${desc || 'An outstanding site of universal cultural and natural significance.'}</div>`;
+
+      // Inject image
+      const imgWrap = document.getElementById(`pup-img-${site.id}`);
+      if (imgWrap && imgUrl) {
+        const skelEl = document.getElementById(`pup-skel-${site.id}`);
+        const img = document.createElement('img');
+        img.onload = () => {
+          img.classList.add('loaded');
+          if (skelEl) skelEl.style.display = 'none';
+          // Force Leaflet to update popup position
+          setTimeout(() => { try { Object.values(markers).find(m => m.isPopupOpen())?.update(); } catch (e) { } }, 50);
+        };
+        img.onerror = () => {
+          if (skelEl) skelEl.style.display = 'none';
+          imgWrap.style.height = '0';
+        };
+        img.src = imgUrl;
+        img.alt = site.name;
+        imgWrap.appendChild(img);
+        const overlay = document.createElement('div');
+        overlay.className = 'pup-img-overlay';
+        imgWrap.appendChild(overlay);
+      } else if (imgWrap) {
+        const skelEl = document.getElementById(`pup-skel-${site.id}`);
+        if (skelEl) skelEl.style.display = 'none';
+        imgWrap.style.height = '0';
+      }
+    }
+
+    // Place markers — skip overseas territories outside map bounds
+    SITES.forEach(s => {
+      if (s.lat < 34 || s.lat > 72 || s.lng < -28 || s.lng > 45) return;
+      const m = L.marker([s.lat, s.lng], { icon: makeIcon(s, false), title: s.name, zIndexOffset: visited.has(s.id) ? 100 : 0 });
+      m.bindTooltip(s.name, { direction: 'top', offset: [0, -4], opacity: 1 });
+      m.bindPopup(() => popupContent(s), { maxWidth: 320, minWidth: 300 });
+      m.on('popupopen', () => { setFocus(s.id, false); enrichPopup(s); });
+      markers[s.id] = m;
+      m.addTo(map);
+    });
+
+    function toggleV(id) {
+      visited.has(id) ? visited.delete(id) : visited.add(id);
+      try { localStorage.setItem('eu_v4', JSON.stringify([...visited])) } catch (e) { }
+      if (_user) saveVisitedToCloud();
+      const s = SITES.find(x => x.id === id), m = markers[id];
+      if (m) { m.setIcon(makeIcon(s, focusedId === id)); m.setZIndexOffset(visited.has(id) ? 100 : 0); }
+      updatePopupVisitedState(id);
+      renderList(); updateStats();
+    }
+    window.toggleV = toggleV;
+
+    function setFocus(id, fly) {
+      const prev = focusedId; focusedId = id;
+      if (prev && prev !== id && markers[prev]) { const ps = SITES.find(s => s.id === prev); if (ps) markers[prev].setIcon(makeIcon(ps, false)) }
+      const s = SITES.find(x => x.id === id); if (!s) return;
+      if (markers[id]) markers[id].setIcon(makeIcon(s, true));
+      if (fly) map.flyTo([s.lat, s.lng], Math.max(map.getZoom(), 11), { duration: 1.1 });
+      renderList();
+      setTimeout(() => document.querySelector(`[data-id="${id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+    }
+    window.flyTo = function (id) { setFocus(id, true); if (markers[id]) setTimeout(() => markers[id].openPopup(), 1200) };
+
+    document.querySelectorAll('.cflag').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const c = btn.dataset.c;
+        if (activeCountry === c) {
+          activeCountry = null;
+          document.querySelectorAll('.cflag').forEach(b => b.classList.remove('on'));
+          SITES.forEach(s => markers[s.id] && markers[s.id].setOpacity(1));
+          map.flyTo([54.0, 12.0], 4, { duration: 1.1 });
+        } else {
+          activeCountry = c;
+          document.querySelectorAll('.cflag').forEach(b => b.classList.remove('on'));
+          btn.classList.add('on');
+          SITES.forEach(s => markers[s.id] && markers[s.id].setOpacity(s.country === c ? 1 : 0.15));
+          const v = COUNTRY_VIEWS[c]; map.flyTo([v[0], v[1]], v[2], { duration: 1.1 });
+        }
+        renderList(); updateStats();
+      });
+    });
+
+    function renderList() {
+      const q = searchQ.toLowerCase();
+      const visIds = new Set(Object.keys(markers).map(Number));
+      const items = SITES.filter(s => {
+        if (!visIds.has(s.id)) return false;
+        if (filter === 'visited' && !visited.has(s.id)) return false;
+        if (filter === 'unvisited' && visited.has(s.id)) return false;
+        if (activeCountry && s.country !== activeCountry) return false;
+        if (q && !s.name.toLowerCase().includes(q)) return false;
+        return true;
+      }).sort((a, b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name));
+
+      if (!items.length) { document.getElementById('list').innerHTML = `<div class="empty">No sites found</div>`; return }
+      document.getElementById('list').innerHTML = items.map((s, i) => {
+        const v = visited.has(s.id), f = focusedId === s.id;
+        const dc = v ? (s.type === 'natural' ? 'vis-nat' : `vis-${s.country}`) : 'unvisited';
+        return `<div class="sitem${f ? ' active' : ''}" data-id="${s.id}" onclick="flyTo(${s.id})" style="animation-delay:${Math.min(i * .015, .3)}s">
+      <div class="sdot ${dc}"></div>
+      <div class="sinfo"><div class="sname">${s.name}</div><div class="smeta">${s.year}</div></div>
+      <span class="ctag ctag-${s.country}">${s.country}</span>
+      <button class="tbtn${v ? ' marked' : ''}" onclick="event.stopPropagation();toggleV(${s.id})">${v ? '✕' : '✓'}</button>
+    </div>`;
+      }).join('');
+    }
+
+    function updateStats() {
+      const visIds = new Set(Object.keys(markers).map(Number));
+      const pool = SITES.filter(s => visIds.has(s.id) && (!activeCountry || s.country === activeCountry));
+      const v = pool.filter(s => visited.has(s.id)).length, t = pool.length;
+      document.getElementById('sv').textContent = v;
+      document.getElementById('sr').textContent = t - v;
+      document.getElementById('st').textContent = t;
+      document.getElementById('sv2').textContent = v;
+      document.getElementById('st2').textContent = t;
+      document.getElementById('pfill').style.width = t ? `${(v / t) * 100}%` : '0%';
+    }
+
+    document.querySelectorAll('.ftab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.ftab').forEach(t => t.classList.remove('on'));
+        tab.classList.add('on'); filter = tab.dataset.f; renderList(); updateStats();
+      });
+    });
+    document.getElementById('srch').addEventListener('input', e => { searchQ = e.target.value; renderList() });
+    renderList(); updateStats();
+  </script>
+</body>
+
+</html>      --it: #7a2020;
+      --se: #4a6b8a;
+      --no: #7a4a1a;
+      --cz: #5a2a6a;
+      --es: #8a2a1a;
+      --pt: #1a6a3a;
+      --at: #6a3a1a;
+      --be: #5a4a1a;
+      --nl: #1a5a6a;
+      --gr: #6a5a1a;
+      --pl: #8a1a3a;
+      --hu: #6a1a5a;
+      --ro: #4a1a6a;
+      --bg: #2a4a6a;
+      --hr: #1a5a4a;
+      --sk: #5a6a1a;
+      --si: #1a4a5a;
+      --dk: #8a2a4a;
+      --fi: #3a6a5a;
+      --ee: #5a3a6a;
+      --lv: #6a2a4a;
+      --lt: #4a6a2a;
+      --lu: #6a5a2a;
+      --ie: #2a6a4a;
+      --mt: #8a5a1a;
+      --cy: #5a2a6a;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Josefin Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      overflow: hidden
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: .4
+    }
+
+    #app {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      grid-template-rows: 56px 1fr;
+      height: 100vh
+    }
+
+    header {
+      grid-column: 1/-1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--paper);
+      z-index: 500;
+      position: relative
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+      opacity: .45
+    }
+
+    .htitle {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: 15.5px;
+      display: flex;
+      align-items: baseline;
+      gap: 7px
+    }
+
+    .htitle .sep {
+      color: var(--muted2);
+      font-size: 13px
+    }
+
+    .htitle em {
+      color: var(--gold);
+      font-style: italic;
+      font-family: 'IM Fell English', serif
+    }
+
+    .htitle .sub {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 8px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 300
+    }
+
+    .hstats {
+      display: flex;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .hstat {
+      padding: 4px 14px;
+      text-align: center;
+      border-right: 1px solid var(--line);
+      font-size: 7px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--muted)
+    }
+
+    .hstat:last-child {
+      border-right: none
+    }
+
+    .hstat b {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: 0;
+      line-height: 1.1;
+      margin-bottom: 1px
+    }
+
+    .hstat b.gold {
+      color: var(--gold)
+    }
+
+    #sidebar {
+      background: var(--paper);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 400
+    }
+
+    .ftab-row {
+      display: flex;
+      gap: 3px;
+      padding: 9px 14px 8px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .ftab {
+      flex: 1;
+      padding: 5px 3px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 7px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      font-weight: 600;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .16s
+    }
+
+    .ftab:hover {
+      border-color: var(--gold-light);
+      color: var(--ink)
+    }
+
+    .ftab.on {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink)
+    }
+
+    .cfilter {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 3px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .cflag {
+      padding: 4px 3px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 7px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      white-space: nowrap
+    }
+
+    .cflag:hover {
+      color: var(--ink);
+      border-color: var(--muted2)
+    }
+
+    .cflag .flag {
+      font-size: 10px
+    }
+
+    .cflag.on {
+      color: #fff !important
+    }
+
+    .cflag.on[data-c="DE"] {
+      background: var(--de);
+      border-color: var(--de)
+    }
+
+    .cflag.on[data-c="FR"] {
+      background: var(--fr);
+      border-color: var(--fr)
+    }
+
+    .cflag.on[data-c="IT"] {
+      background: var(--it);
+      border-color: var(--it)
+    }
+
+    .cflag.on[data-c="SE"] {
+      background: var(--se);
+      border-color: var(--se)
+    }
+
+    .cflag.on[data-c="NO"] {
+      background: var(--no);
+      border-color: var(--no)
+    }
+
+    .cflag.on[data-c="CZ"] {
+      background: var(--cz);
+      border-color: var(--cz)
+    }
+
+    .cflag.on[data-c="ES"] {
+      background: var(--es);
+      border-color: var(--es)
+    }
+
+    .cflag.on[data-c="PT"] {
+      background: var(--pt);
+      border-color: var(--pt)
+    }
+
+    .cflag.on[data-c="AT"] {
+      background: var(--at);
+      border-color: var(--at)
+    }
+
+    .cflag.on[data-c="BE"] {
+      background: var(--be);
+      border-color: var(--be)
+    }
+
+    .cflag.on[data-c="NL"] {
+      background: var(--nl);
+      border-color: var(--nl)
+    }
+
+    .cflag.on[data-c="GR"] {
+      background: var(--gr);
+      border-color: var(--gr)
+    }
+
+    .cflag.on[data-c="PL"] {
+      background: var(--pl);
+      border-color: var(--pl)
+    }
+
+    .cflag.on[data-c="HU"] {
+      background: var(--hu);
+      border-color: var(--hu)
+    }
+
+    .cflag.on[data-c="RO"] {
+      background: var(--ro);
+      border-color: var(--ro)
+    }
+
+    .cflag.on[data-c="BG"] {
+      background: var(--bg);
+      border-color: var(--bg)
+    }
+
+    .cflag.on[data-c="HR"] {
+      background: var(--hr);
+      border-color: var(--hr)
+    }
+
+    .cflag.on[data-c="SK"] {
+      background: var(--sk);
+      border-color: var(--sk)
+    }
+
+    .cflag.on[data-c="SI"] {
+      background: var(--si);
+      border-color: var(--si)
+    }
+
+    .cflag.on[data-c="DK"] {
+      background: var(--dk);
+      border-color: var(--dk)
+    }
+
+    .cflag.on[data-c="FI"] {
+      background: var(--fi);
+      border-color: var(--fi)
+    }
+
+    .cflag.on[data-c="EE"] {
+      background: var(--ee);
+      border-color: var(--ee)
+    }
+
+    .cflag.on[data-c="LV"] {
+      background: var(--lv);
+      border-color: var(--lv)
+    }
+
+    .cflag.on[data-c="LT"] {
+      background: var(--lt);
+      border-color: var(--lt)
+    }
+
+    .cflag.on[data-c="LU"] {
+      background: var(--lu);
+      border-color: var(--lu)
+    }
+
+    .cflag.on[data-c="IE"] {
+      background: var(--ie);
+      border-color: var(--ie)
+    }
+
+    .cflag.on[data-c="MT"] {
+      background: var(--mt);
+      border-color: var(--mt)
+    }
+
+    .cflag.on[data-c="CY"] {
+      background: var(--cy);
+      border-color: var(--cy)
+    }
+
+    .search-wrap {
+      padding: 7px 14px;
+      border-bottom: 1px solid var(--line);
+      position: relative
+    }
+
+    .srch {
+      width: 100%;
+      padding: 6px 10px 6px 27px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 9px;
+      letter-spacing: .05em;
+      background: var(--paper3);
+      border: 1px solid transparent;
+      border-radius: 2px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .16s, background .16s
+    }
+
+    .srch:focus {
+      border-color: var(--gold-light);
+      background: var(--paper)
+    }
+
+    .srch::placeholder {
+      color: var(--muted2)
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 25px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 11px;
+      height: 11px;
+      color: var(--muted);
+      pointer-events: none
+    }
+
+    #list {
+      overflow-y: auto;
+      flex: 1;
+      padding: 2px 0
+    }
+
+    #list::-webkit-scrollbar {
+      width: 3px
+    }
+
+    #list::-webkit-scrollbar-thumb {
+      background: var(--paper3);
+      border-radius: 2px
+    }
+
+    .sitem {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: background .12s, border-color .15s
+    }
+
+    .sitem:hover {
+      background: rgba(22, 18, 14, .025)
+    }
+
+    .sitem.active {
+      background: linear-gradient(90deg, rgba(184, 132, 42, .07), transparent);
+      border-left-color: var(--gold)
+    }
+
+    .sitem.active .sname {
+      color: var(--gold)
+    }
+
+    .sdot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .sdot.unvisited {
+      background: transparent;
+      border: 1.5px solid var(--muted2)
+    }
+
+    .sdot.vis-DE {
+      background: var(--de)
+    }
+
+    .sdot.vis-FR {
+      background: var(--fr)
+    }
+
+    .sdot.vis-IT {
+      background: var(--it)
+    }
+
+    .sdot.vis-SE {
+      background: var(--se)
+    }
+
+    .sdot.vis-NO {
+      background: var(--no)
+    }
+
+    .sdot.vis-CZ {
+      background: var(--cz)
+    }
+
+    .sdot.vis-ES {
+      background: var(--es)
+    }
+
+    .sdot.vis-PT {
+      background: var(--pt)
+    }
+
+    .sdot.vis-AT {
+      background: var(--at)
+    }
+
+    .sdot.vis-BE {
+      background: var(--be)
+    }
+
+    .sdot.vis-NL {
+      background: var(--nl)
+    }
+
+    .sdot.vis-GR {
+      background: var(--gr)
+    }
+
+    .sdot.vis-PL {
+      background: var(--pl)
+    }
+
+    .sdot.vis-HU {
+      background: var(--hu)
+    }
+
+    .sdot.vis-RO {
+      background: var(--ro)
+    }
+
+    .sdot.vis-BG {
+      background: var(--bg)
+    }
+
+    .sdot.vis-HR {
+      background: var(--hr)
+    }
+
+    .sdot.vis-SK {
+      background: var(--sk)
+    }
+
+    .sdot.vis-SI {
+      background: var(--si)
+    }
+
+    .sdot.vis-DK {
+      background: var(--dk)
+    }
+
+    .sdot.vis-FI {
+      background: var(--fi)
+    }
+
+    .sdot.vis-EE {
+      background: var(--ee)
+    }
+
+    .sdot.vis-LV {
+      background: var(--lv)
+    }
+
+    .sdot.vis-LT {
+      background: var(--lt)
+    }
+
+    .sdot.vis-LU {
+      background: var(--lu)
+    }
+
+    .sdot.vis-IE {
+      background: var(--ie)
+    }
+
+    .sdot.vis-MT {
+      background: var(--mt)
+    }
+
+    .sdot.vis-CY {
+      background: var(--cy)
+    }
+
+    .sdot.vis-nat {
+      background: var(--nat)
+    }
+
+    .sinfo {
+      flex: 1;
+      min-width: 0
+    }
+
+    .sname {
+      font-family: 'Playfair Display', serif;
+      font-size: 10.5px;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color .15s
+    }
+
+    .smeta {
+      font-size: 6px;
+      letter-spacing: .08em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 1px
+    }
+
+    .ctag {
+      font-size: 5.5px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      padding: 1.5px 4px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      font-weight: 700;
+      border: 1px solid transparent
+    }
+
+    .ctag-DE {
+      background: rgba(42, 92, 63, .1);
+      color: var(--de);
+      border-color: rgba(42, 92, 63, .2)
+    }
+
+    .ctag-FR {
+      background: rgba(26, 74, 122, .1);
+      color: var(--fr);
+      border-color: rgba(26, 74, 122, .2)
+    }
+
+    .ctag-IT {
+      background: rgba(122, 32, 32, .1);
+      color: var(--it);
+      border-color: rgba(122, 32, 32, .2)
+    }
+
+    .ctag-SE {
+      background: rgba(74, 107, 138, .1);
+      color: var(--se);
+      border-color: rgba(74, 107, 138, .2)
+    }
+
+    .ctag-NO {
+      background: rgba(122, 74, 26, .1);
+      color: var(--no);
+      border-color: rgba(122, 74, 26, .2)
+    }
+
+    .ctag-CZ {
+      background: rgba(90, 42, 106, .1);
+      color: var(--cz);
+      border-color: rgba(90, 42, 106, .2)
+    }
+
+    .ctag-ES {
+      background: rgba(138, 42, 26, .1);
+      color: var(--es);
+      border-color: rgba(138, 42, 26, .2)
+    }
+
+    .ctag-PT {
+      background: rgba(26, 106, 58, .1);
+      color: var(--pt);
+      border-color: rgba(26, 106, 58, .2)
+    }
+
+    .ctag-AT {
+      background: rgba(106, 58, 26, .1);
+      color: var(--at);
+      border-color: rgba(106, 58, 26, .2)
+    }
+
+    .ctag-BE {
+      background: rgba(90, 74, 26, .1);
+      color: var(--be);
+      border-color: rgba(90, 74, 26, .2)
+    }
+
+    .ctag-NL {
+      background: rgba(26, 90, 106, .1);
+      color: var(--nl);
+      border-color: rgba(26, 90, 106, .2)
+    }
+
+    .ctag-GR {
+      background: rgba(106, 90, 26, .1);
+      color: var(--gr);
+      border-color: rgba(106, 90, 26, .2)
+    }
+
+    .ctag-PL {
+      background: rgba(138, 26, 58, .1);
+      color: var(--pl);
+      border-color: rgba(138, 26, 58, .2)
+    }
+
+    .ctag-HU {
+      background: rgba(106, 26, 90, .1);
+      color: var(--hu);
+      border-color: rgba(106, 26, 90, .2)
+    }
+
+    .ctag-RO {
+      background: rgba(74, 26, 106, .1);
+      color: var(--ro);
+      border-color: rgba(74, 26, 106, .2)
+    }
+
+    .ctag-BG {
+      background: rgba(42, 74, 106, .1);
+      color: var(--bg);
+      border-color: rgba(42, 74, 106, .2)
+    }
+
+    .ctag-HR {
+      background: rgba(26, 90, 74, .1);
+      color: var(--hr);
+      border-color: rgba(26, 90, 74, .2)
+    }
+
+    .ctag-SK {
+      background: rgba(90, 106, 26, .1);
+      color: var(--sk);
+      border-color: rgba(90, 106, 26, .2)
+    }
+
+    .ctag-SI {
+      background: rgba(26, 74, 90, .1);
+      color: var(--si);
+      border-color: rgba(26, 74, 90, .2)
+    }
+
+    .ctag-DK {
+      background: rgba(138, 42, 74, .1);
+      color: var(--dk);
+      border-color: rgba(138, 42, 74, .2)
+    }
+
+    .ctag-FI {
+      background: rgba(58, 106, 90, .1);
+      color: var(--fi);
+      border-color: rgba(58, 106, 90, .2)
+    }
+
+    .ctag-EE {
+      background: rgba(90, 58, 106, .1);
+      color: var(--ee);
+      border-color: rgba(90, 58, 106, .2)
+    }
+
+    .ctag-LV {
+      background: rgba(106, 42, 74, .1);
+      color: var(--lv);
+      border-color: rgba(106, 42, 74, .2)
+    }
+
+    .ctag-LT {
+      background: rgba(74, 106, 42, .1);
+      color: var(--lt);
+      border-color: rgba(74, 106, 42, .2)
+    }
+
+    .ctag-LU {
+      background: rgba(106, 90, 42, .1);
+      color: var(--lu);
+      border-color: rgba(106, 90, 42, .2)
+    }
+
+    .ctag-IE {
+      background: rgba(42, 106, 74, .1);
+      color: var(--ie);
+      border-color: rgba(42, 106, 74, .2)
+    }
+
+    .ctag-MT {
+      background: rgba(138, 90, 26, .1);
+      color: var(--mt);
+      border-color: rgba(138, 90, 26, .2)
+    }
+
+    .ctag-CY {
+      background: rgba(90, 42, 106, .1);
+      color: var(--cy);
+      border-color: rgba(90, 42, 106, .2)
+    }
+
+    .tbtn {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      cursor: pointer;
+      flex-shrink: 0;
+      font-size: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: all .15s
+    }
+
+    .tbtn:hover {
+      transform: scale(1.15);
+      border-color: var(--gold-light);
+      color: var(--gold)
+    }
+
+    .tbtn.marked {
+      color: var(--red);
+      border-color: rgba(140, 48, 48, .35)
+    }
+
+    .sbfoot {
+      padding: 9px 14px;
+      border-top: 1px solid var(--line);
+      flex-shrink: 0;
+      background: var(--paper3)
+    }
+
+    .pflex {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 5px
+    }
+
+    .plabel {
+      font-size: 6.5px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600
+    }
+
+    .pval {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      color: var(--ink)
+    }
+
+    .pval span {
+      font-size: 8px;
+      color: var(--muted);
+      font-family: 'Josefin Sans', sans-serif;
+      letter-spacing: .04em
+    }
+
+    .ptrack {
+      height: 2px;
+      background: var(--line);
+      border-radius: 2px;
+      overflow: visible;
+      position: relative
+    }
+
+    .pfill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--vis), var(--gold));
+      border-radius: 2px;
+      transition: width .5s cubic-bezier(.4, 0, .2, 1);
+      position: relative
+    }
+
+    .pfill::after {
+      content: '';
+      position: absolute;
+      right: -3px;
+      top: -3px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 5px rgba(184, 132, 42, .55)
+    }
+
+    .empty {
+      padding: 24px 14px;
+      font-size: 8.5px;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    #mapwrap {
+      position: relative;
+      overflow: hidden
+    }
+
+    #map {
+      width: 100%;
+      height: 100%
+    }
+
+    .leaflet-container {
+      background: #ddd8cc !important;
+      font-family: 'Josefin Sans', sans-serif !important
+    }
+
+    .leaflet-tile-pane {
+      filter: sepia(18%) contrast(.97) brightness(.99) saturate(.85)
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: var(--ink);
+      color: var(--paper);
+      border-radius: 4px;
+      box-shadow: 0 12px 48px rgba(22, 18, 14, .5);
+      padding: 0;
+      font-family: 'Josefin Sans', sans-serif;
+      border: none;
+      overflow: hidden
+    }
+
+    .leaflet-popup-content {
+      margin: 0 !important;
+      padding: 0;
+      width: 300px !important
+    }
+
+    .leaflet-popup-tip {
+      background: var(--ink) !important
+    }
+
+    .leaflet-popup-close-button {
+      color: rgba(247, 243, 236, .55) !important;
+      top: 9px !important;
+      right: 11px !important;
+      font-size: 18px !important;
+      z-index: 10;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, .7)
+    }
+
+    .leaflet-popup-close-button:hover {
+      color: #fff !important
+    }
+
+    .pup-img-wrap {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      background: #1a1710;
+      flex-shrink: 0
+    }
+
+    .pup-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity .5s ease
+    }
+
+    .pup-img-wrap img.loaded {
+      opacity: 1
+    }
+
+    .pup-img-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65%;
+      background: linear-gradient(to top, rgba(22, 18, 14, .95), transparent);
+      pointer-events: none
+    }
+
+    .pup-img-skeleton {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, #1a1710 25%, #252019 50%, #1a1710 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0
+      }
+
+      100% {
+        background-position: -200% 0
+      }
+    }
+
+    .pup-accent {
+      height: 2.5px
+    }
+
+    .pup-body {
+      padding: 13px 14px 12px
+    }
+
+    .pup-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 13.5px;
+      line-height: 1.35;
+      margin-bottom: 3px;
+      padding-right: 16px;
+      color: var(--paper);
+      font-weight: 400
+    }
+
+    .pup-meta {
+      font-size: 6.5px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(247, 243, 236, .3);
+      margin-bottom: 10px
+    }
+
+    .pup-desc {
+      font-size: 9px;
+      line-height: 1.68;
+      color: rgba(247, 243, 236, .65);
+      margin-bottom: 12px;
+      font-weight: 300;
+      letter-spacing: .02em;
+      min-height: 44px
+    }
+
+    .pup-desc-loading {
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 12px
+    }
+
+    .pup-desc-loading span {
+      display: block;
+      height: 8px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, .07) 25%, rgba(255, 255, 255, .13) 50%, rgba(255, 255, 255, .07) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite
+    }
+
+    .pup-desc-loading span:nth-child(1) {
+      width: 100%
+    }
+
+    .pup-desc-loading span:nth-child(2) {
+      width: 100%
+    }
+
+    .pup-desc-loading span:nth-child(3) {
+      width: 100%
+    }
+
+    .pup-desc-loading span:nth-child(4) {
+      width: 65%
+    }
+
+    .pup-foot {
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
+
+    .pup-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 6px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 2px;
+      font-weight: 600;
+      flex-shrink: 0
+    }
+
+    .pup-status.v {
+      background: rgba(42, 92, 63, .55);
+      color: #a8d4b8
+    }
+
+    .pup-status.u {
+      background: rgba(247, 243, 236, .07);
+      color: rgba(247, 243, 236, .38)
+    }
+
+    .pup-btn {
+      flex: 1;
+      padding: 6px 8px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 7px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 600;
+      border: 1px solid rgba(247, 243, 236, .16);
+      background: transparent;
+      color: var(--paper);
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background .14s, border-color .14s;
+      white-space: nowrap
+    }
+
+    .pup-btn:hover {
+      background: rgba(247, 243, 236, .08);
+      border-color: rgba(247, 243, 236, .3)
+    }
+
+    .pup-btn.vbtn {
+      border-color: rgba(42, 92, 63, .5);
+      color: #a8d4b8
+    }
+
+    .pup-btn.vbtn:hover {
+      background: rgba(42, 92, 63, .22)
+    }
+
+    .leaflet-tooltip {
+      background: var(--ink) !important;
+      color: var(--paper) !important;
+      border: none !important;
+      font-family: 'Josefin Sans', sans-serif !important;
+      font-size: 9px !important;
+      letter-spacing: .07em !important;
+      border-radius: 2px !important;
+      padding: 4px 9px !important;
+      box-shadow: 0 2px 10px rgba(22, 18, 14, .22) !important;
+      white-space: nowrap !important
+    }
+
+    .leaflet-tooltip-top::before {
+      border-top-color: var(--ink) !important
+    }
+
+    #legend {
+      position: absolute;
+      bottom: 20px;
+      right: 16px;
+      z-index: 1000;
+      background: rgba(247, 243, 236, .96);
+      border: 1px solid rgba(22, 18, 14, .07);
+      border-radius: 3px;
+      padding: 9px 12px;
+      box-shadow: var(--shadow)
+    }
+
+    .leg-title {
+      font-size: 6px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+      font-weight: 600
+    }
+
+    .li {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 4px;
+      font-size: 7px;
+      letter-spacing: .07em;
+      color: var(--muted);
+      text-transform: uppercase
+    }
+
+    .li:last-of-type {
+      margin-bottom: 0
+    }
+
+    .ldot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .leg-div {
+      margin: 5px 0;
+      border-top: 1px solid var(--line2)
+    }
+
+    .leg-tip {
+      margin-top: 5px;
+      padding-top: 5px;
+      border-top: 1px solid var(--line);
+      font-size: 6px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted2)
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .sitem {
+      animation: fadeUp .14s ease both
+    }
+
+    /* ── Auth Modal ──────────────────────────────────────────────────────────── */
+    #auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 18, 14, .72);
+      z-index: 9000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       backdrop-filter: blur(3px)
     }
 
