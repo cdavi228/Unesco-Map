@@ -191,9 +191,53 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .leg-tip{margin-top:5px;padding-top:5px;border-top:1px solid var(--line);font-size:6px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .sitem{animation:fadeUp .14s ease both}
+
+/* ── Auth Modal ──────────────────────────────────────────────────────────── */
+#auth-overlay{position:fixed;inset:0;background:rgba(22,18,14,.72);z-index:9000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+#auth-overlay.hidden{display:none}
+#auth-box{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:32px 36px;width:340px;box-shadow:0 24px 64px rgba(22,18,14,.35)}
+.auth-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:4px;color:var(--ink)}
+.auth-sub{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.auth-label{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;display:block;margin-bottom:5px}
+.auth-input{width:100%;padding:9px 12px;font-family:'Josefin Sans',sans-serif;font-size:12px;background:var(--paper3);border:1px solid var(--line);border-radius:3px;color:var(--ink);outline:none;margin-bottom:14px;transition:border-color .15s}
+.auth-input:focus{border-color:var(--gold-light);background:var(--paper)}
+.auth-btn{width:100%;padding:10px;font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;background:var(--ink);color:var(--paper);border:none;border-radius:3px;cursor:pointer;margin-bottom:10px;transition:background .15s}
+.auth-btn:hover{background:#2a2218}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-toggle{font-size:8px;letter-spacing:.08em;color:var(--muted);text-align:center;cursor:pointer}
+.auth-toggle span{color:var(--gold);text-decoration:underline;cursor:pointer}
+.auth-err{font-size:8px;color:var(--red);margin-bottom:10px;min-height:14px;letter-spacing:.04em}
+.auth-divider{border:none;border-top:1px solid var(--line);margin:14px 0}
+/* ── User pill in header ─────────────────────────────────────────────────── */
+#user-pill{display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+#user-pill.hidden{display:none}
+#login-btn{font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:.13em;text-transform:uppercase;font-weight:600;padding:5px 12px;border:1px solid var(--line);border-radius:2px;background:transparent;cursor:pointer;color:var(--muted);transition:all .15s}
+#login-btn:hover{border-color:var(--gold-light);color:var(--ink)}
+#logout-btn{font-family:'Josefin Sans',sans-serif;font-size:7px;letter-spacing:.13em;text-transform:uppercase;font-weight:600;padding:5px 12px;border:1px solid var(--line);border-radius:2px;background:transparent;cursor:pointer;color:var(--muted);transition:all .15s}
+#logout-btn:hover{border-color:var(--red);color:var(--red)}
+#user-email{font-family:'Josefin Sans',sans-serif;font-size:7.5px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-dot{width:5px;height:5px;border-radius:50%;background:var(--nat);display:inline-block;margin-right:3px}
+
 </style>
 </head>
 <body>
+
+<div id="auth-overlay" class="hidden">
+  <div id="auth-box">
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-sub">Sign in to sync your visited sites</div>
+    <div class="auth-err" id="auth-err"></div>
+    <label class="auth-label">Email</label>
+    <input class="auth-input" id="auth-email" type="email" placeholder="you@example.com">
+    <label class="auth-label">Password</label>
+    <input class="auth-input" id="auth-pass" type="password" placeholder="••••••••">
+    <button class="auth-btn" id="auth-submit">Sign in</button>
+    <div class="auth-toggle" id="auth-toggle">No account? <span onclick="toggleAuthMode()">Create one</span></div>
+    <hr class="auth-divider">
+    <div style="font-size:7px;color:var(--muted2);text-align:center;letter-spacing:.06em">Your visited sites sync across all devices</div>
+  </div>
+</div>
+
 <div id="app">
   <header>
     <div class="htitle">Europe <span class="sep">—</span> <em>UNESCO Heritage</em> <span class="sub">Travel Journal</span></div>
@@ -261,6 +305,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const COUNTRY_COLORS={
   DE:{fill:'#2a5c3f',stroke:'#162e22'},FR:{fill:'#1a4a7a',stroke:'#0d2640'},
@@ -764,10 +809,90 @@ const SITES=[
   {id:2703,name:"Choirokoitia Neolithic Settlement",year:1998,type:"cultural",country:"CY",lat:34.7961,lng:33.3425},
 ];
 
+// ── Supabase ──────────────────────────────────────────────────────────────────
+const _supa = supabase.createClient('https://ddtzpwwnwslcswawbjud.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkdHpwd3dud3NsY3N3YXdianVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3ODcxNTksImV4cCI6MjA4ODM2MzE1OX0.RFeRHSJwzTDvLtTQ8izwhK0-7l4ofcdZkZnjV09BIc4');
+let _user = null;
+
 // ── State ─────────────────────────────────────────────────────────────────────
 let visited=new Set();
 try{visited=new Set(JSON.parse(localStorage.getItem('eu_v4')||'[]'))}catch(e){}
 let filter='all',activeCountry=null,searchQ='',focusedId=null,markers={};
+
+// ── Auth helpers ──────────────────────────────────────────────────────────────
+let _authMode = 'signin';
+function showAuth(){ document.getElementById('auth-overlay').classList.remove('hidden'); }
+function hideAuth(){ document.getElementById('auth-overlay').classList.add('hidden'); document.getElementById('auth-err').textContent=''; }
+function toggleAuthMode(){
+  _authMode = _authMode==='signin'?'signup':'signin';
+  document.querySelector('.auth-title').textContent = _authMode==='signin'?'Welcome back':'Create account';
+  document.querySelector('.auth-sub').textContent = _authMode==='signin'?'Sign in to sync your visited sites':'Sign up to sync your visited sites';
+  document.getElementById('auth-submit').textContent = _authMode==='signin'?'Sign in':'Create account';
+  document.querySelector('#auth-toggle span').textContent = _authMode==='signin'?'Create one':'Sign in instead';
+  document.querySelector('.auth-toggle').innerHTML = _authMode==='signin'?'No account? <span onclick="toggleAuthMode()">Create one</span>':'Have an account? <span onclick="toggleAuthMode()">Sign in instead</span>';
+}
+window.showAuth=showAuth; window.toggleAuthMode=toggleAuthMode;
+
+document.getElementById('auth-overlay').addEventListener('click', e => { if(e.target===e.currentTarget) hideAuth(); });
+
+document.getElementById('auth-submit').addEventListener('click', async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const btn = document.getElementById('auth-submit');
+  const errEl = document.getElementById('auth-err');
+  if(!email||!pass){ errEl.textContent='Please enter email and password.'; return; }
+  btn.disabled=true; btn.textContent='Please wait…'; errEl.textContent='';
+  const fn = _authMode==='signin' ? _supa.auth.signInWithPassword.bind(_supa.auth) : _supa.auth.signUp.bind(_supa.auth);
+  const { error } = await fn({ email, password: pass });
+  btn.disabled=false; btn.textContent=_authMode==='signin'?'Sign in':'Create account';
+  if(error){ errEl.textContent=error.message; return; }
+  if(_authMode==='signup'){ errEl.style.color='var(--nat)'; errEl.textContent='Check your email to confirm your account!'; return; }
+  hideAuth();
+});
+
+async function signOut(){
+  await _supa.auth.signOut();
+  _user=null;
+  setUserUI(null);
+  // Fall back to localStorage
+  try{visited=new Set(JSON.parse(localStorage.getItem('eu_v4')||'[]'))}catch(e){visited=new Set();}
+  renderList(); updateStats();
+}
+window.signOut=signOut;
+
+function setUserUI(user){
+  const pill=document.getElementById('user-pill');
+  const loginBtn=document.getElementById('login-btn');
+  if(user){
+    document.getElementById('user-email').textContent=user.email;
+    pill.classList.remove('hidden'); loginBtn.classList.add('hidden');
+  } else {
+    pill.classList.add('hidden'); loginBtn.classList.remove('hidden');
+  }
+}
+
+async function loadVisitedFromCloud(){
+  if(!_user) return;
+  const { data } = await _supa.from('visited_sites').select('site_ids').eq('id',_user.id).single();
+  if(data?.site_ids){
+    visited = new Set(data.site_ids);
+    // Refresh all markers
+    SITES.forEach(s=>{ if(markers[s.id]) markers[s.id].setIcon(makeIcon(s, focusedId===s.id)); });
+    renderList(); updateStats();
+  }
+}
+
+async function saveVisitedToCloud(){
+  if(!_user) return;
+  await _supa.from('visited_sites').upsert({ id:_user.id, site_ids:[...visited], updated_at:new Date().toISOString() });
+}
+
+// Listen for auth state changes
+_supa.auth.onAuthStateChange(async (event, session) => {
+  _user = session?.user ?? null;
+  setUserUI(_user);
+  if(_user) await loadVisitedFromCloud();
+});
+
 
 // ── Map ───────────────────────────────────────────────────────────────────────
 const EUROPE_BOUNDS=L.latLngBounds(L.latLng(34.0,-28),L.latLng(72.0,45));
@@ -947,6 +1072,7 @@ SITES.forEach(s=>{
 function toggleV(id){
   visited.has(id)?visited.delete(id):visited.add(id);
   try{localStorage.setItem('eu_v4',JSON.stringify([...visited]))}catch(e){}
+  if(_user) saveVisitedToCloud();
   const s=SITES.find(x=>x.id===id),m=markers[id];
   if(m){m.setIcon(makeIcon(s,focusedId===id));m.setZIndexOffset(visited.has(id)?100:0);}
   updatePopupVisitedState(id);
