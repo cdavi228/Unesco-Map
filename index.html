@@ -960,16 +960,30 @@
       color: #fff !important
     }
 
-    .pup-img-wrap {
+    /* Gallery */
+    .pup-gallery {
       position: relative;
       width: 100%;
-      height: 160px;
+      height: 170px;
       overflow: hidden;
       background: #1a1710;
       flex-shrink: 0
     }
 
-    .pup-img-wrap img {
+    .pup-gallery-inner {
+      display: flex;
+      height: 100%;
+      transition: transform .35s cubic-bezier(.4, 0, .2, 1);
+      will-change: transform
+    }
+
+    .gal-slide {
+      flex: 0 0 100%;
+      height: 100%;
+      overflow: hidden
+    }
+
+    .gal-slide img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -978,7 +992,7 @@
       transition: opacity .5s ease
     }
 
-    .pup-img-wrap img.loaded {
+    .gal-slide img.loaded {
       opacity: 1
     }
 
@@ -989,7 +1003,8 @@
       right: 0;
       height: 65%;
       background: linear-gradient(to top, rgba(22, 18, 14, .95), transparent);
-      pointer-events: none
+      pointer-events: none;
+      z-index: 2
     }
 
     .pup-img-skeleton {
@@ -997,7 +1012,65 @@
       inset: 0;
       background: linear-gradient(90deg, #1a1710 25%, #252019 50%, #1a1710 75%);
       background-size: 200% 100%;
-      animation: shimmer 1.5s infinite
+      animation: shimmer 1.5s infinite;
+      z-index: 3
+    }
+
+    .gal-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(22, 18, 14, .55);
+      border: 1px solid rgba(247, 243, 236, .18);
+      color: var(--paper);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+      line-height: 1;
+      padding-bottom: 1px
+    }
+
+    .gal-btn:hover {
+      background: rgba(22, 18, 14, .85)
+    }
+
+    .gal-prev {
+      left: 8px
+    }
+
+    .gal-next {
+      right: 8px
+    }
+
+    .gal-dots {
+      position: absolute;
+      bottom: 7px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      z-index: 10
+    }
+
+    .gal-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(247, 243, 236, .35);
+      cursor: pointer;
+      transition: background .15s;
+      flex-shrink: 0
+    }
+
+    .gal-dot.active {
+      background: rgba(247, 243, 236, .9)
     }
 
     @keyframes shimmer {
@@ -1038,12 +1111,23 @@
 
     .pup-desc {
       font-size: 9px;
-      line-height: 1.68;
+      line-height: 1.72;
       color: rgba(247, 243, 236, .65);
       margin-bottom: 12px;
       font-weight: 300;
       letter-spacing: .02em;
-      min-height: 44px
+      min-height: 44px;
+      max-height: 160px;
+      overflow-y: auto
+    }
+
+    .pup-desc::-webkit-scrollbar {
+      width: 2px
+    }
+
+    .pup-desc::-webkit-scrollbar-thumb {
+      background: rgba(247, 243, 236, .2);
+      border-radius: 2px
     }
 
     .pup-desc-loading {
@@ -1077,6 +1161,10 @@
 
     .pup-desc-loading span:nth-child(4) {
       width: 65%
+    }
+
+    .pup-desc-loading span:nth-child(5) {
+      width: 80%
     }
 
     .pup-foot {
@@ -2175,60 +2263,77 @@
 
     async function fetchEnrichment(site) {
       if (enrichCache[site.id]) return enrichCache[site.id];
-
-      // Fetch description from Claude and image from Wikimedia simultaneously
-      const [claudeRes, imgUrl] = await Promise.all([
+      const [desc, images] = await Promise.all([
         fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             model: "claude-sonnet-4-20250514",
-            max_tokens: 1000,
+            max_tokens: 1200,
             messages: [{
               role: "user",
-              content: `Write a vivid, engaging 2-3 sentence description of the UNESCO World Heritage Site "${site.name}" in ${COUNTRY_NAMES[site.country]} (inscribed ${site.year}). Explain what makes it extraordinary and why it deserved UNESCO recognition. Be evocative and specific — mention striking visual details, historical significance, or unique qualities. Do not start with the site name. Plain text only, no markdown.`
+              content: `Write a rich, engaging paragraph (5-7 sentences) about the UNESCO World Heritage Site "${site.name}" in ${COUNTRY_NAMES[site.country]} (inscribed ${site.year}). Cover: what makes it visually striking, its historical or ecological significance, why UNESCO recognised it, and what a visitor would experience. Be evocative and specific. Do not start with the site name. Plain text only, no markdown.`
             }]
           })
         }).then(r => r.json()).then(d => d.content?.[0]?.text || "").catch(() => ""),
-
-        fetchWikimediaImage(site)
+        fetchWikimediaImages(site)
       ]);
-
-      const result = { desc: claudeRes, imgUrl };
+      const result = { desc, images };
       enrichCache[site.id] = result;
       return result;
     }
 
-    async function fetchWikimediaImage(site) {
-      // Build a search query tailored to the site
+    async function fetchWikimediaImages(site) {
+      const PHOTO_EXT = /\.(jpg|jpeg|png|webp)(\?|$)/i;
       const query = `${site.name} ${COUNTRY_NAMES[site.country]}`;
+
+      async function getImagesForTitle(title) {
+        try {
+          const r = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=images&imlimit=20&format=json&origin=*`);
+          const d = await r.json();
+          const page = Object.values(d.query?.pages || {})[0];
+          const imgTitles = (page?.images || []).map(i => i.title).filter(t => PHOTO_EXT.test(t)).slice(0, 8);
+          if (!imgTitles.length) return [];
+          const r2 = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(imgTitles.join('|'))}&prop=imageinfo&iiprop=url&iiurlwidth=700&format=json&origin=*`);
+          const d2 = await r2.json();
+          return Object.values(d2.query?.pages || {}).map(p => p.imageinfo?.[0]?.thumburl || p.imageinfo?.[0]?.url).filter(Boolean);
+        } catch (e) { return []; }
+      }
+
+      let imgs = await getImagesForTitle(site.name);
+
+      if (imgs.length === 0) {
+        try {
+          const s = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json&origin=*`);
+          const sd = await s.json();
+          const title = sd.query?.search?.[0]?.title;
+          if (title) imgs = await getImagesForTitle(title);
+        } catch (e) { }
+      }
+
+      // Always try to get the lead image and put it first
       try {
-        const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(site.name)}&prop=pageimages&piprop=original&pithumbsize=600&format=json&origin=*`;
-        const r = await fetch(searchUrl);
+        const r = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(site.name)}&prop=pageimages&piprop=original&pithumbsize=700&format=json&origin=*`);
         const d = await r.json();
-        const pages = d.query?.pages || {};
-        const page = Object.values(pages)[0];
-        if (page?.original?.source) return page.original.source;
-        if (page?.thumbnail?.source) return page.thumbnail.source;
-        // Fallback: search for the page first
-        const s2 = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&prop=pageimages&format=json&origin=*`);
-        const d2 = await s2.json();
-        const title = d2.query?.search?.[0]?.title;
-        if (!title) return null;
-        const s3 = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&piprop=original&pithumbsize=600&format=json&origin=*`);
-        const d3 = await s3.json();
-        const pages3 = d3.query?.pages || {};
-        const page3 = Object.values(pages3)[0];
-        return page3?.original?.source || page3?.thumbnail?.source || null;
-      } catch (e) { return null; }
+        const page = Object.values(d.query?.pages || {})[0];
+        const lead = page?.original?.source || page?.thumbnail?.source;
+        if (lead && !imgs.includes(lead)) imgs.unshift(lead);
+      } catch (e) { }
+
+      return imgs.slice(0, 6);
     }
 
     function popupContent(site) {
       const v = visited.has(site.id);
-      const skelRows = `<div class="pup-desc-loading"><span></span><span></span><span></span><span></span></div>`;
+      const skelRows = `<div class="pup-desc-loading"><span></span><span></span><span></span><span></span><span></span></div>`;
       return `
-    <div class="pup-img-wrap" id="pup-img-${site.id}">
+    <div class="pup-gallery" id="pup-gallery-${site.id}">
       <div class="pup-img-skeleton" id="pup-skel-${site.id}"></div>
+      <div class="pup-gallery-inner" id="pup-imgs-${site.id}"></div>
+      <button class="gal-btn gal-prev" id="gal-prev-${site.id}" onclick="galNav(${site.id},-1)" style="display:none">&#8249;</button>
+      <button class="gal-btn gal-next" id="gal-next-${site.id}" onclick="galNav(${site.id},1)" style="display:none">&#8250;</button>
+      <div class="gal-dots" id="gal-dots-${site.id}"></div>
+      <div class="pup-img-overlay"></div>
     </div>
     <div class="pup-accent" style="background:${ACCENT[site.country]}"></div>
     <div class="pup-body">
@@ -2242,54 +2347,90 @@
     </div>`;
     }
 
+    // Gallery state per site
+    const galState = {};
+
+    function galNav(siteId, dir) {
+      const st = galState[siteId];
+      if (!st) return;
+      st.idx = (st.idx + dir + st.total) % st.total;
+      updateGallery(siteId);
+    }
+    window.galNav = galNav;
+
+    function updateGallery(siteId) {
+      const st = galState[siteId];
+      if (!st) return;
+      const inner = document.getElementById(`pup-imgs-${siteId}`);
+      if (inner) inner.style.transform = `translateX(-${st.idx * 100}%)`;
+      // Dots
+      const dotsEl = document.getElementById(`gal-dots-${siteId}`);
+      if (dotsEl) {
+        dotsEl.innerHTML = Array.from({ length: st.total }, (_, i) =>
+          `<span class="gal-dot${i === st.idx ? ' active' : ''}" onclick="galNav(${siteId},${i - st.idx})"></span>`
+        ).join('');
+      }
+      // Arrow visibility — always show if >1 image
+      const prev = document.getElementById(`gal-prev-${siteId}`);
+      const next = document.getElementById(`gal-next-${siteId}`);
+      if (prev) prev.style.display = st.total > 1 ? 'flex' : 'none';
+      if (next) next.style.display = st.total > 1 ? 'flex' : 'none';
+    }
+
     function updatePopupVisitedState(id) {
       const v = visited.has(id);
       const statusEl = document.getElementById(`pup-status-${id}`);
       const btnEl = document.getElementById(`pup-btn-${id}`);
-      if (statusEl) {
-        statusEl.className = `pup-status ${v ? 'v' : 'u'}`;
-        statusEl.textContent = v ? '✓ Visited' : '○ Not visited';
-      }
-      if (btnEl) {
-        btnEl.className = `pup-btn${v ? ' vbtn' : ''}`;
-        btnEl.textContent = v ? 'Mark unvisited' : 'Mark visited';
-      }
+      if (statusEl) { statusEl.className = `pup-status ${v ? 'v' : 'u'}`; statusEl.textContent = v ? '✓ Visited' : '○ Not visited'; }
+      if (btnEl) { btnEl.className = `pup-btn${v ? ' vbtn' : ''}`; btnEl.textContent = v ? 'Mark unvisited' : 'Mark visited'; }
     }
 
     async function enrichPopup(site) {
-      const { desc, imgUrl } = await fetchEnrichment(site);
+      const { desc, images } = await fetchEnrichment(site);
 
       // Inject description
       const descEl = document.getElementById(`pup-desc-${site.id}`);
       if (descEl) descEl.innerHTML = `<div class="pup-desc">${desc || 'An outstanding site of universal cultural and natural significance.'}</div>`;
 
-      // Inject image
-      const imgWrap = document.getElementById(`pup-img-${site.id}`);
-      if (imgWrap && imgUrl) {
-        const skelEl = document.getElementById(`pup-skel-${site.id}`);
+      // Inject gallery
+      const skelEl = document.getElementById(`pup-skel-${site.id}`);
+      const inner = document.getElementById(`pup-imgs-${site.id}`);
+      const gallery = document.getElementById(`pup-gallery-${site.id}`);
+
+      if (!inner || !gallery) return;
+
+      if (!images || images.length === 0) {
+        if (skelEl) skelEl.style.display = 'none';
+        gallery.style.height = '0';
+        return;
+      }
+
+      galState[site.id] = { idx: 0, total: images.length };
+
+      let loadedCount = 0;
+      images.forEach((url, i) => {
+        const slide = document.createElement('div');
+        slide.className = 'gal-slide';
         const img = document.createElement('img');
+        img.alt = `${site.name} ${i + 1}`;
         img.onload = () => {
           img.classList.add('loaded');
-          if (skelEl) skelEl.style.display = 'none';
-          // Force Leaflet to update popup position
-          setTimeout(() => { try { Object.values(markers).find(m => m.isPopupOpen())?.update(); } catch (e) { } }, 50);
+          loadedCount++;
+          if (loadedCount === 1) {
+            if (skelEl) skelEl.style.display = 'none';
+            updateGallery(site.id);
+            try { Object.values(markers).find(m => m.isPopupOpen())?.update(); } catch (e) { }
+          }
         };
-        img.onerror = () => {
-          if (skelEl) skelEl.style.display = 'none';
-          imgWrap.style.height = '0';
-        };
-        img.src = imgUrl;
-        img.alt = site.name;
-        imgWrap.appendChild(img);
-        const overlay = document.createElement('div');
-        overlay.className = 'pup-img-overlay';
-        imgWrap.appendChild(overlay);
-      } else if (imgWrap) {
-        const skelEl = document.getElementById(`pup-skel-${site.id}`);
-        if (skelEl) skelEl.style.display = 'none';
-        imgWrap.style.height = '0';
-      }
+        img.onerror = () => { slide.style.display = 'none'; };
+        img.src = url;
+        slide.appendChild(img);
+        inner.appendChild(slide);
+      });
+
+      updateGallery(site.id);
     }
+
 
     // Place markers — skip overseas territories outside map bounds
     SITES.forEach(s => {
